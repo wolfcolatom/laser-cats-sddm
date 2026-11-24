@@ -20,6 +20,9 @@ them by itself. See "Classic cats" below.
 
 - **SDDM 0.21 or newer with the Qt 6 greeter** (`sddm-greeter-qt6`)
 - **Qt 6 Quick modules**: Effects, Shapes, Particles (on Arch: `qt6-declarative`)
+- **Qt 6 image formats** for the animated WebP cats (Arch: `qt6-imageformats`,
+  Debian/Ubuntu: `qt6-image-formats-plugins`, Fedora: `qt6-qtimageformats`).
+  Plasma usually has it already; without it the theme runs with no cats.
 - **A GPU-accelerated X server for SDDM.** The animation is too heavy for
   software rendering; if the login screen stays black, SDDM's X server isn't
   accelerated (on some Intel machines the old `xf86-video-intel` driver

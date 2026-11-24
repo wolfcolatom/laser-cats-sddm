@@ -111,12 +111,12 @@ magick "$s/oval.png" "$s/inset.png" -compose multiply -composite "$s/right.png" 
     "$s/jaw.png" -compose multiply -composite "$s/mask.png"
 args=()
 for k in $(seq 0 24); do
-    src=$(printf "%s/gf/%03d.png" "$s" $((113 + 2 * k))); out=$(printf "%s/nf/%02d.png" "$s" $k)
+    src=$(printf "%s/gf/%03d.png" "$s" $((113 + 2 * k))); out=$(printf "%s/nf/%02d.png" "$s" "$k")
     [ -f "$src" ] || { echo "The spiral GIF has fewer frames than expected." >&2; exit 1; }
     magick -size 768x768 xc:none \( "$src" -alpha off \) -geometry +188+276 -composite -alpha off "$s/fr.png"
     magick "$s/fr.png" -colorspace gray -level 13%,48% "$s/mask.png" -compose multiply -composite "$s/al.png"
     magick "$s/fr.png" "$s/al.png" -alpha off -compose CopyOpacity -composite "$out"
-    if [ $k -lt 24 ]; then args+=(-delay 6 "$out"); else args+=(-delay 600 "$out"); fi
+    if [ "$k" -lt 24 ]; then args+=(-delay 6 "$out"); else args+=(-delay 600 "$out"); fi
 done
 magick "${args[@]}" -background none -loop 0 -define webp:lossless=false -quality 82 \
     -define webp:alpha-quality=90 "$work/out/spiral-cat.webp"

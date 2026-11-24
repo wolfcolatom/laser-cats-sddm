@@ -18,7 +18,7 @@ jobs:
     container: archlinux:latest
     steps:
       - name: Install Qt 6
-        run: pacman -Syu --noconfirm --needed qt6-declarative qt6-svg mesa ttf-dejavu git
+        run: pacman -Syu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats mesa ttf-dejavu git
       - uses: actions/checkout@v4
       - name: qmllint
         run: /usr/lib/qt6/bin/qmllint --max-warnings 0 *.qml ci/*.qml
