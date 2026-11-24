@@ -60,8 +60,11 @@ QMLFILES  := Main.qml $(wildcard sky/*.qml login/*.qml style/*.qml ci/*.qml test
 LINT      := $(if $(HAVE_VK),$(QMLFILES),$(filter-out login/VirtualKeyboard.qml,$(QMLFILES)))
 
 lint:
-	$(if $(HAVE_VK),,@echo "(qt6-virtualkeyboard not installed: not linting VirtualKeyboard.qml)")
-	$(QTBIN)/qmllint --max-warnings 0 $(abspath $(LINT))   # (absolute paths: qmllint needs them to match qmldir singletons)
+	$(if $(HAVE_VK),,@echo "(qt6-virtualkeyboard not installed: not linting login/VirtualKeyboard.qml)")
+	@# absolute paths: qmllint needs them to match qmldir singletons
+	@$(QTBIN)/qmllint --max-warnings 0 $(abspath $(LINT)) > /dev/null 2>&1 \
+	  && echo "lint: $(words $(LINT)) files, no warnings" \
+	  || { $(QTBIN)/qmllint --json - $(abspath $(LINT)) 2>/dev/null | python3 ci/lint-report.py; exit 1; }
 
 test:
 	$(QML_ENV) $(QTBIN)/qmltestrunner -input tests

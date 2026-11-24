@@ -7,8 +7,8 @@
 import QtQuick
 import QtQuick.Window
 import QtTest
-// (reads the theme's own properties through the Loader:)
-// qmllint disable missing-property
+import "../login"
+import "../tests"
 
 Window {
     id: win
@@ -16,28 +16,8 @@ Window {
     visibility: Window.FullScreen
     color: "black"
 
-    QtObject { id: config; property string calm: "false" }
-    QtObject { id: keyboard; property bool capsLock: false }
-    QtObject {
-        id: userModel
-        property string lastUser: "user"
-        property int lastIndex: 0
-        function index(r, c) { return r }
-        function data(i, role) { return "user" }
-    }
-    ListModel { id: sessionModel; property int lastIndex: 0; ListElement { name: "Plasma" } }
-    QtObject {
-        id: sddm
-        property bool canReboot: true
-        property bool canPowerOff: true
-        signal loginSucceeded()
-        signal loginFailed()
-        signal informationMessage(string message)
-        function login(user, password, session) {}
-        function reboot() {}
-        function powerOff() {}
-    }
-    Loader { id: theme; anchors.fill: parent; source: "../Main.qml" }
+    FakeBackend { id: fake; answers: false }      // (never answers: the screen stays up to be measured)
+    LoginScreen { id: screen; anchors.fill: parent; backend: fake }
     TestCase { id: keys; when: false; name: "perf" }
 
     // frame times (ms) per phase
@@ -57,7 +37,7 @@ Window {
     }
     // warm up 3 s, idle 10 s, type 2 s, then Enter and 2.5 s of explosion and warp
     SequentialAnimation {
-        running: theme.status === Loader.Ready
+        running: true
         PauseAnimation { duration: 3000 }
         ScriptAction { script: win.phase = "idle" }
         PauseAnimation { duration: 10000 }
@@ -69,7 +49,7 @@ Window {
         ScriptAction {
             script: {
                 win.phase = "done"
-                console.log("perf: " + Screen.width + "x" + Screen.height + " (x" + Screen.devicePixelRatio + "), software rendering: " + theme.item.softwareRendering)
+                console.log("perf: " + Screen.width + "x" + Screen.height + " (x" + Screen.devicePixelRatio + "), software rendering: " + screen.softwareRendering)
                 for (const n of ["idle", "typing", "login"]) console.log("perf: " + win.summary(n))
                 Qt.exit(0)
             }

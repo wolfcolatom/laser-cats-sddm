@@ -2,46 +2,50 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es">
 <context>
-    <name>Main</name>
+    <name>LoginScreen</name>
     <message>
-        <location filename="../Main.qml" line="92"/>
-        <source>Wrong password</source>
-        <translation>Contraseña incorrecta</translation>
-    </message>
-    <message>
-        <location filename="../Main.qml" line="203"/>
         <source>User</source>
         <translation>Usuario</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="263"/>
-        <location filename="../Main.qml" line="264"/>
+        <source>Wrong password</source>
+        <translation>Contraseña incorrecta</translation>
+    </message>
+    <message>
         <source>Password</source>
         <translation>Contraseña</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="265"/>
-        <location filename="../Main.qml" line="302"/>
         <source>Caps Lock is on</source>
         <translation>Bloq Mayús está activado</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="329"/>
         <source>Session</source>
         <translation>Sesión</translation>
     </message>
+</context>
+<context>
+    <name>PasswordField</name>
     <message>
-        <location filename="../Main.qml" line="385"/>
+        <source>Password</source>
+        <translation>Contraseña</translation>
+    </message>
+    <message>
+        <source>Caps Lock is on</source>
+        <translation>Bloq Mayús está activado</translation>
+    </message>
+</context>
+<context>
+    <name>PowerButtons</name>
+    <message>
         <source>On-screen keyboard</source>
         <translation>Teclado en pantalla</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="387"/>
         <source>Restart</source>
         <translation>Reiniciar</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="388"/>
         <source>Shut down</source>
         <translation>Apagar</translation>
     </message>

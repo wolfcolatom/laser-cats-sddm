@@ -9,6 +9,7 @@ QtObject {
     readonly property color jade: "#43af9c"         // lasers, constellation lines
     readonly property color mint: "#8dd2c6"         // lasers, star trails, glows, the date
     readonly property color amber: "#dfa33a"        // lasers, fire, warnings, the wrong-password wash
+    readonly property color amberDeep: "#a86b00"    // the far end of the password field's edge
     readonly property color white: "#f2f4f3"        // stars, beam cores, text
     readonly property color flare: "#ffe2a8"        // explosion flashes and embers
 
@@ -32,6 +33,7 @@ QtObject {
     readonly property color outline: "#1f2421"
     readonly property color outlineHover: "#2a302d"
 
-    // `colour`, fully see-through (for a gradient's far end)
-    function clear(colour: color): color { return Qt.rgba(colour.r, colour.g, colour.b, 0) }
+    // `colour` at `opacity` (0-1), and fully see-through (for a gradient's far end)
+    function faded(colour: color, opacity: real): color { return Qt.rgba(colour.r, colour.g, colour.b, opacity) }
+    function clear(colour: color): color { return faded(colour, 0) }
 }

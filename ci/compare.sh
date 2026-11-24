@@ -13,8 +13,11 @@ out=${OUTDIR:-$(mktemp -d)}
 threshold=${THRESHOLD:-0.01}
 mkdir -p "$out"
 
+# the same font, language and time zone everywhere: only the bundled Space
+# Grotesk (ci/fonts.conf), the C locale, UTC
+FONTCONFIG_FILE="$here/fonts.conf" LC_ALL=C.UTF-8 TZ=UTC \
 QT_QPA_PLATFORM=offscreen QT_FORCE_STDERR_LOGGING=1 \
-    timeout 120 /usr/lib/qt6/bin/qml "$here/visual.qml" -- "$out"
+    timeout 180 /usr/lib/qt6/bin/qml "$here/visual.qml" -- "$out"
 
 if [ "${1:-}" = "--update" ]; then
     for f in "$out"/*.png; do magick "$f" -strip "PNG24:$here/golden/$(basename "$f")"; done

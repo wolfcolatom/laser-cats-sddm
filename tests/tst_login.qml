@@ -1,215 +1,265 @@
 // SPDX-FileCopyrightText: 2026 tom
 // SPDX-License-Identifier: GPL-3.0-or-later
-// The login flow, with stand-ins for what SDDM gives a theme.
-//   QT_QPA_PLATFORM=offscreen qmltestrunner -input tests
-// (The tests read the theme's own properties through a Loader, which the
-// linter only knows as a plain object:)
-// qmllint disable missing-property
+// The login screen (login/LoginScreen.qml) driven like a person would,
+// against a fake display manager (FakeBackend.qml).
+//   make test
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtTest
+import "../login"
+import "../sky"
 
 Item {
     id: host
     width: 1280; height: 720
-    // SDDM tells each copy of the theme whether it's on the primary screen
-    property bool primaryScreen: true
 
-    // what SDDM provides
-    QtObject {
-        id: config
-        property string accent: "#43af9c"
-        property string calm: "false"
-        property string classic: "false"
-        property string timeFormat: ""
-        property string dateFormat: ""
+    FakeBackend { id: fake }
+    ListModel {
+        id: twoUsers
+        ListElement { name: "ada" }
+        ListElement { name: "grace" }
     }
-    QtObject { id: keyboard; property bool capsLock: false }
-    QtObject {
-        id: userModel
-        property string lastUser: "user"
-        property int lastIndex: 0
-        function index(r, c) { return r }
-        function data(i, role) { return "user" }
+    Component { id: oneUser; ListModel { ListElement { name: "user" } } }
+    Component {
+        id: screenComponent
+        LoginScreen { anchors.fill: parent; backend: fake }
     }
-    ListModel { id: sessionModel; property int lastIndex: 0; ListElement { name: "Plasma (Wayland)" } }
-    QtObject {
-        id: sddm
-        property bool canReboot: true
-        property bool canPowerOff: true
-        property var calls: []
-        property bool accept: true          // answer with success (or failure)
-        property bool answers: true         // answer at all
-        signal loginSucceeded()
-        signal loginFailed()
-        signal informationMessage(string message)
-        function login(user, password, session) {
-            calls = calls.concat([{ user: user, password: password, session: session }])
-            if (answers) reply.start()
-        }
-        function reboot() {}
-        function powerOff() {}
-    }
-    Timer { id: reply; interval: 50; onTriggered: sddm.accept ? sddm.loginSucceeded() : sddm.loginFailed() }
-
-    Loader { id: theme; anchors.fill: parent }
 
     TestCase {
         name: "Login"
         when: windowShown
 
-        function load(calm) {
-            config.calm = calm ? "true" : "false"
-            theme.source = ""
-            theme.source = "../Main.qml"
-            tryCompare(theme, "status", Loader.Ready)
+        property LoginScreen screen: null
+        property var users: null
+
+        // a fresh screen, with these theme.conf settings
+        function load(settings) {
+            if (screen) screen.destroy()
+            fake.settings = Object.assign({ calm: "false" }, settings || {})
+            screen = screenComponent.createObject(host)
+            verify(screen)
+            return screen
         }
         function init() {
-            keyboard.capsLock = false
-            host.primaryScreen = true
-            config.timeFormat = ""; config.dateFormat = ""
-            sddm.calls = []; sddm.accept = true; sddm.answers = true
-            load(false)
+            fake.reset()
+            users = oneUser.createObject(host)
+            fake.users = users
+            load()
         }
-        function field() { return findChild(theme.item, "password") }
-        function submit(text) {
+        function cleanup() {
+            if (screen) { screen.destroy(); screen = null }
+            if (users) { users.destroy(); users = null }
+        }
+        function part(name) {
+            const item = findChild(screen, name)
+            verify(item, name + " exists")
+            return item
+        }
+        function field() { return part("password") }
+        function sky(): Sky { return part("sky") as Sky }
+        function controller(): LoginController { return part("login") as LoginController }
+        function type(text) {
             field().forceActiveFocus()
             for (const c of text) keyClick(c)
-            keyClick(Qt.Key_Return)
         }
+        function submit(text) { type(text); keyClick(Qt.Key_Return) }
 
+        // ---- logging in
         function test_rightPasswordLogsInAfterTheExplosion() {
             submit("meow")
-            compare(sddm.calls.length, 0, "not sent before the explosion")
+            compare(fake.logins.length, 0, "not sent before the explosion")
             compare(field().text, "", "field emptied at once")
-            tryVerify(() => sddm.calls.length === 1, 4000)
-            compare(sddm.calls[0].password, "meow")
-            compare(sddm.calls[0].user, "user")
-            compare(sddm.calls[0].session, 0)
-            compare(theme.item.pending, "", "password not kept after it was sent")
+            verify(sky().blast > 0 || sky().warp > 0 || controller().busy, "the explosion is playing")
+            tryVerify(() => fake.logins.length === 1, 4000)
+            compare(fake.logins[0], { user: "user", password: "meow", session: 0 })
+            compare(controller().pending, "", "password not kept after it was sent")
         }
         function test_wrongPasswordRewinds() {
-            sddm.accept = false
+            fake.accept = false
             submit("nope")
-            tryVerify(() => sddm.calls.length === 1, 4000)
-            tryVerify(() => !theme.item.launching, 1000)
+            tryVerify(() => fake.logins.length === 1, 4000)
+            tryVerify(() => !controller().busy, 1000)
             compare(field().text, "")
             compare(field().placeholderText, "Wrong password")
-            tryVerify(() => findChild(theme.item, "sky").blast === 0, 3000)
+            verify(field().activeFocus, "ready for another try")
+            tryVerify(() => sky().blast === 0, 3000)
         }
         function test_emptyPasswordIsIgnored() {
             submit("")
-            wait(300)
-            compare(sddm.calls.length, 0)
-            verify(!theme.item.launching)
+            wait(200)
+            compare(fake.logins.length, 0)
+            verify(!controller().busy)
         }
         function test_secondEnterDoesNotSendTwice() {
             submit("meow")
             keyClick(Qt.Key_Return)
-            tryVerify(() => sddm.calls.length === 1, 4000)
-            wait(300)
-            compare(sddm.calls.length, 1)
+            tryVerify(() => fake.logins.length === 1, 4000)
+            wait(200)
+            compare(fake.logins.length, 1)
         }
-        function test_calmDoesNotSendTwice() {
-            load(true)
+        function test_fieldIsLockedWhileLoggingIn() {
             submit("meow")
-            submit("meow")
-            compare(sddm.calls.length, 1)
-        }
-        function test_passwordNotKeptAfterSending() {
-            submit("meow")
-            tryVerify(() => sddm.calls.length === 1, 4000)
-            compare(theme.item.pending, "")
+            verify(!field().enabled)
         }
         function test_calmLogsInStraightAway() {
-            load(true)
+            load({ calm: "true" })
             submit("meow")
-            compare(sddm.calls.length, 1, "no explosion delay in calm mode")
-            compare(sddm.calls[0].password, "meow")
-            compare(findChild(theme.item, "sky").blast, 0)
+            compare(fake.logins.length, 1, "no explosion delay in calm mode")
+            compare(sky().blast, 0)
+            verify(sky().calm)
         }
-        function test_watchdogGivesTheFieldBack() {
-            sddm.answers = false
-            theme.item.watchdogMs = 300
+        function test_calmAutoFollowsTheRenderer() {
+            load({ calm: "auto" })
+            const software = screen.softwareRendering
             submit("meow")
-            tryVerify(() => sddm.calls.length === 1, 4000)
-            tryVerify(() => !theme.item.launching, 2000)
+            compare(fake.logins.length, software ? 1 : 0, software ? "no GPU: straight in" : "GPU: the explosion first")
+            compare(sky().frozen, software)
+        }
+        function test_noAnswerGivesTheFieldBack() {
+            fake.answers = false
+            controller().watchdogMs = 300
+            submit("meow")
+            tryVerify(() => fake.logins.length === 1, 4000)
+            tryVerify(() => !controller().busy, 2000)
             verify(field().activeFocus)
+            compare(field().placeholderText, "Password", "not called a wrong password")
         }
+        function test_chosenSessionIsSent() {
+            load({ calm: "true" })
+            const picker = part("sessionPicker")
+            picker.currentIndex = 1
+            picker.activated(1)
+            submit("meow")
+            compare(fake.logins[0].session, 1)
+        }
+
+        // ---- who is logging in
+        function test_oneUserShowsJustTheName() {
+            verify(!part("userPicker").visible)
+            compare(controller().user, "user")
+        }
+        function test_firstUserWhenNobodyLoggedInBefore() {
+            fake.lastUser = ""
+            load()
+            compare(controller().user, "user")
+        }
+        function test_severalUsersGetAList() {
+            fake.users = twoUsers
+            fake.lastUser = "grace"; fake.lastUserIndex = 1
+            load({ calm: "true" })
+            const picker = part("userPicker")
+            verify(picker.visible)
+            compare(picker.count, 2)
+            compare(picker.displayText, "grace")
+            compare(controller().user, "grace")
+            type("half")
+            picker.currentIndex = 0
+            picker.activated(0)
+            compare(controller().user, "ada")
+            compare(field().text, "", "switching user clears what was typed")
+            submit("meow")
+            compare(fake.logins[0].user, "ada")
+        }
+        function test_listsShowNames() {
+            const picker = part("sessionPicker")
+            compare(picker.displayText, "Plasma (Wayland)")
+            picker.popup.open()
+            tryVerify(() => picker.popup.opened, 2000)
+            tryVerify(() => findChild(picker.popup.contentItem, "sessionPicker-1") !== null, 2000)
+            compare(findChild(picker.popup.contentItem, "sessionPicker-0").text, "Plasma (Wayland)")
+            compare(findChild(picker.popup.contentItem, "sessionPicker-1").text, "niri")
+            picker.popup.close()
+        }
+
+        // ---- warnings and messages
         function test_capsLockWarning() {
-            const warning = findChild(theme.item, "capsWarning")
+            const warning = part("capsWarning")
             verify(!warning.visible)
-            keyboard.capsLock = true
+            fake.capsLock = true
             verify(warning.visible)
+            compare(field().Accessible.description, "Caps Lock is on")
+        }
+        function test_messageShowsAndClears() {
+            const message = part("message")
+            verify(!message.visible)
+            fake.informationMessage("Your password expires in 3 days")
+            verify(message.visible)
+            compare(message.text, "Your password expires in 3 days")
+            type("x")
+            verify(!message.visible, "cleared once you type")
         }
         function test_escapeClearsTheField() {
-            field().forceActiveFocus()
-            keyClick("a"); keyClick("b")
+            type("ab")
             compare(field().text, "ab")
             keyClick(Qt.Key_Escape)
             compare(field().text, "")
         }
-    
-        function test_sddmMessageShowsAndClears() {
-            const msg = findChild(theme.item, "message")
-            verify(!msg.visible)
-            sddm.informationMessage("Your password expires in 3 days")
-            verify(msg.visible)
-            compare(msg.text, "Your password expires in 3 days")
+
+        // ---- power buttons
+        function test_powerButtons() {
+            mouseClick(part("restartButton"))
+            compare(fake.reboots, 1)
+            mouseClick(part("shutDownButton"))
+            compare(fake.powerOffs, 1)
+        }
+        function test_powerButtonsHideWhenNotAllowed() {
+            fake.canReboot = false
+            verify(!part("restartButton").visible)
+            verify(part("shutDownButton").visible)
+        }
+        function test_keyboardButtonOnlyWhenAsked() {
+            verify(!part("keyboardButton").visible, "no on-screen keyboard button by default")
+        }
+
+        // ---- keyboard use and screen readers
+        function test_tabOrder() {
             field().forceActiveFocus()
-            keyClick("x")
-            verify(!msg.visible, "cleared once you type")
+            keyClick(Qt.Key_Tab)
+            verify(part("sessionPicker").activeFocus, "password -> session list")
+            keyClick(Qt.Key_Tab)
+            verify(part("restartButton").activeFocus, "-> restart")
+            keyClick(Qt.Key_Tab)
+            verify(part("shutDownButton").activeFocus, "-> shut down")
+            keyClick(Qt.Key_Tab)
+            verify(field().activeFocus, "and round to the password")
         }
-        function test_sessionListShowsNames() {
-            const picker = findChild(theme.item, "sessionPicker")
-            compare(picker.displayText, "Plasma (Wayland)")
-            picker.popup.open()
-            tryVerify(() => picker.popup.opened, 2000)
-            tryVerify(() => findChild(picker.popup.contentItem, "session-0") !== null, 2000)
-            compare(findChild(picker.popup.contentItem, "session-0").text, "Plasma (Wayland)")
-            picker.popup.close()
-        }
-        function test_controlsOnlyOnThePrimaryScreen() {
-            host.primaryScreen = false
-            load(false)
-            verify(!findChild(theme.item, "sessionPicker").visible)
-            verify(!field().visible)
-            verify(findChild(theme.item, "clock").visible, "the clock shows on every screen")
-        }
-        function test_timeFormatSetting() {
-            config.timeFormat = "HH:mm"
-            load(false)
-            verify(/^\d\d:\d\d$/.test(findChild(theme.item, "clock").text), findChild(theme.item, "clock").text)
-            verify(findChild(theme.item, "clockColon").visible)
-        }
-        function test_timeWithoutAColon() {
-            config.timeFormat = "HH.mm"
-            load(false)
-            verify(!findChild(theme.item, "clockColon").visible, "no stray colon")
-        }
-        function test_dateHasNoYear() {
-            const year = String(new Date().getFullYear())
-            verify(findChild(theme.item, "date").text.indexOf(year) < 0, findChild(theme.item, "date").text)
+        function test_enterPressesAFocusedButton() {
+            part("restartButton").forceActiveFocus()
+            keyClick(Qt.Key_Return)
+            compare(fake.reboots, 1)
         }
         function test_screenReaderNames() {
             compare(field().Accessible.name, "Password")
-            compare(findChild(theme.item, "sessionPicker").Accessible.name, "Session")
-            compare(findChild(theme.item, "power-1").Accessible.name, "Restart")
-            compare(findChild(theme.item, "power-2").Accessible.name, "Shut down")
-            compare(findChild(theme.item, "capsWarning").Accessible.role, Accessible.AlertMessage)
-            verify(findChild(theme.item, "clock").Accessible.name.length > 0)
+            compare(part("sessionPicker").Accessible.name, "Session")
+            compare(part("userPicker").Accessible.name, "User")
+            compare(part("restartButton").Accessible.name, "Restart")
+            compare(part("shutDownButton").Accessible.name, "Shut down")
+            compare(part("capsWarning").Accessible.role, Accessible.AlertMessage)
+            compare(part("message").Accessible.role, Accessible.AlertMessage)
+            verify(part("clockBlock").Accessible.name.length > 0)
         }
-        function test_calmAutoFollowsTheRenderer() {
-            config.calm = "auto"
-            theme.source = ""; theme.source = "../Main.qml"
-            tryCompare(theme, "status", Loader.Ready)
-            const software = theme.item.softwareRendering
-            submit("meow")
-            compare(sddm.calls.length, software ? 1 : 0,
-                    software ? "no GPU: straight in" : "GPU: the explosion first")
-            compare(findChild(theme.item, "sky").frozen, software)
+
+        // ---- screens and settings
+        function test_controlsOnlyOnThePrimaryScreen() {
+            fake.primary = false
+            load()
+            verify(!part("sessionPicker").visible)
+            verify(!field().visible)
+            verify(!part("restartButton").visible)
+            verify(part("clockBlock").visible, "the clock shows on every screen")
         }
-        function test_keyboardButtonOnlyWhenAsked() {
-            verify(!findChild(theme.item, "power-0").visible, "no keyboard button by default")
+        function test_timeFormatSetting() {
+            load({ timeFormat: "HH:mm" })
+            verify(/^\d\d:\d\d$/.test(part("clock").text), part("clock").text)
+            verify(part("clockColon").visible)
+        }
+        function test_timeWithoutAColon() {
+            load({ timeFormat: "HH.mm" })
+            verify(!part("clockColon").visible, "no stray colon")
+        }
+        function test_dateHasNoYear() {
+            const year = String(new Date().getFullYear())
+            verify(part("date").text.indexOf(year) < 0, part("date").text)
         }
     }
 }
