@@ -16,7 +16,7 @@ optdepends=('qt6-virtualkeyboard: on-screen keyboard (keyboard=true in theme.con
             'python-numpy: get-cats.sh')
 backup=(usr/share/sddm/themes/laser-cats/theme.conf)
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')  # set once v$pkgver is tagged
+sha256sums=('73aad0d7443b1b6e4d62a8ca6e730ffb2705cf9caaebaa4b70b2d35212f7c55a')
 
 build() {
     cd "laser-cats-sddm-$pkgver"
