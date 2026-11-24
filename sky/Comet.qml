@@ -27,7 +27,7 @@ Item {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.55; color: Qt.rgba(0.196, 0.561, 0.494, 0.45) }
+            GradientStop { position: 0.55; color: Theme.faded(Theme.jadeDeep, 0.45) }
             GradientStop { position: 0.9; color: Theme.mint }
             GradientStop { position: 1.0; color: Theme.white }
         }

@@ -36,17 +36,25 @@ Nothing looks different; this release is about how the theme is built.
   pressed, and the lists lock until SDDM answers.
 - An answer from SDDM arriving after the theme had stopped waiting wiped
   what had been typed since.
+- The date kept a stray word where the year had been in some languages
+  (Spanish and Portuguese "…de noviembre de", Russian "…ноября г.").
+- Enter with an empty password did nothing, so accounts without a
+  password and fingerprint readers couldn't log in. It is now sent like
+  any other.
 - A message wider than the password field pushed the field off-centre.
 - A mistyped `accent` colour turned the focus rings black; it now falls
   back to jade.
 - The drop-down arrow was a character some fonts don't have; it is drawn.
-- `make install` no longer copies Python cache folders.
+- `make install` no longer copies Python cache folders or the art
+  scripts, and never needs Qt's tools.
 - The on-screen keyboard filled the whole screen, slid in at start-up, and
   once up covered its own button and could cover the password field. It
   now slides up only when asked, and the controls move clear of it.
 - The oldest supported Qt is 6.8, not 6.5 as the notes said.
 
 ### Added
+- `askUsername=true` in theme.conf: a field for the username instead of
+  SDDM's list, for network accounts it doesn't list.
 - Tests for the controller, the settings and the on-screen keyboard, and
   reference pictures of the login screen itself (plain, with warnings,
   with several users).

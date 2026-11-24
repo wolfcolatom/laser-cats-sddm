@@ -11,7 +11,7 @@
 set -euo pipefail
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 out=${OUTDIR:-$(mktemp -d)}
-threshold=${THRESHOLD:-0.002}
+threshold=${THRESHOLD:-0.0005}
 qtbin=${QTBIN:-/usr/lib/qt6/bin}
 mkdir -p "$out"
 

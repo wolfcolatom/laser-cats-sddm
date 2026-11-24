@@ -70,7 +70,8 @@ Item {
             submit("meow")
             compare(fake.logins.length, 0, "not sent before the explosion")
             compare(field().text, "", "field emptied at once")
-            verify(sky().blast > 0 || sky().warp > 0 || controller().busy, "the explosion is playing")
+            compare(controller().stage, LoginController.Stage.Exploding)
+            tryVerify(() => sky().blast > 0, 1000, "the explosion is playing")
             tryVerify(() => fake.logins.length === 1, 4000)
             compare(fake.logins[0], { user: "user", password: "meow", session: 0 })
             compare(controller().pending, "", "password not kept after it was sent")
@@ -85,11 +86,11 @@ Item {
             verify(field().activeFocus, "ready for another try")
             tryVerify(() => sky().blast === 0, 3000)
         }
-        function test_emptyPasswordIsIgnored() {
+        function test_enterAloneLogsInToo() {
+            // accounts without a password, and fingerprint readers
+            load({ calm: "true" })
             submit("")
-            wait(200)
-            compare(fake.logins.length, 0)
-            verify(!controller().busy)
+            compare(fake.logins, [{ user: "user", password: "", session: 0 }])
         }
         function test_secondEnterDoesNotSendTwice() {
             submit("meow")
@@ -198,6 +199,17 @@ Item {
         }
         function test_nameFieldOnlyWhenNobodyIsListed() {
             verify(!part("username").visible)
+        }
+        function test_askUsernameReplacesTheList() {
+            fake.users = twoUsers
+            fake.lastUser = "grace"; fake.lastUserIndex = 1
+            load({ calm: "true", askUsername: "true" })
+            verify(part("username").visible)
+            verify(!part("userPicker").visible)
+            compare(part("username").text, "grace", "the last one to log in is filled in")
+            part("username").text = "someone-on-the-network"
+            submit("meow")
+            compare(fake.logins[0].user, "someone-on-the-network")
         }
         function test_listsShowNames() {
             const picker = part("sessionPicker")

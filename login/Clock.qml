@@ -17,7 +17,30 @@ Item {
                                                                  : Qt.locale().timeFormat(Locale.ShortFormat))
     // the locale's long date without the year, unless a format is given
     readonly property string dateText: Qt.locale().toString(now, dateFormat !== "" ? dateFormat
-        : Qt.locale().dateFormat(Locale.LongFormat).replace(/[\s,.\/-]*y+[\s,.年]*/, " ").trim())
+        : withoutYear(Qt.locale().dateFormat(Locale.LongFormat)))
+
+    // A Qt date format with the year taken out, along with the words and
+    // punctuation that joined it to its neighbour:
+    //   "dddd, d 'de' MMMM 'de' yyyy" -> "dddd, d 'de' MMMM"
+    //   "d MMMM yyyy 'г'."            -> "d MMMM"
+    //   "yyyy年M月d日dddd"             -> "M月d日dddd"
+    function withoutYear(format: string): string {
+        // fields (a run of one letter) and the text between them (quoted or not)
+        const parts = format.match(/([a-zA-Z])\1*|'[^']*'|[^a-zA-Z']+/g) ?? []
+        const isField = part => /^[a-zA-Z]/.test(part)
+        const year = parts.findIndex(part => /^y+$/.test(part))
+        if (year < 0) return format
+        // the text either side of the year, up to the neighbouring fields
+        let from = year, to = year
+        while (from > 0 && !isField(parts[from - 1])) from--
+        while (to < parts.length - 1 && !isField(parts[to + 1])) to++
+        const first = from === 0, last = to === parts.length - 1
+        // at the start it goes with what follows it, at the end with all
+        // around it, in the middle with what comes before it
+        const cutFrom = first ? 0 : from
+        const cutTo = first || last ? to : year
+        return parts.slice(0, cutFrom).concat(parts.slice(cutTo + 1)).join("").trim()
+    }
     readonly property real timeBottom: time.height
 
     implicitWidth: Math.max(time.implicitWidth, date.implicitWidth)

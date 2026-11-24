@@ -19,7 +19,7 @@ on-screen keyboard, `qt6-virtualkeyboard`. On Arch:
 |---|---|
 | `make lint` | Qt 6 `qmllint`, no warnings allowed |
 | `make test` | the Qt Quick Test suites in `tests/` |
-| `make smoke` | loads the theme headless: normal, calm, software-rendered, HiDPI, right-to-left |
+| `make smoke` | loads the theme headless: normal, calm, HiDPI, right-to-left, on-screen keyboard |
 | `make visual` | renders the sky and the login screen at fixed moments and compares with `ci/golden/` |
 | `make translations` | compiles `translations/*.ts` and checks none are unfinished |
 | `make i18n` | every translation shows up on the login screen |

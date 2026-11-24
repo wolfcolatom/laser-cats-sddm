@@ -43,10 +43,11 @@ TestCase {
         compare(fake.logins.length, 1)
         compare(login.stage, LoginController.Stage.Waiting)
     }
-    function test_emptyIsIgnored() {
-        verify(!login.submit(""))
-        compare(login.stage, LoginController.Stage.Idle)
-        compare(explosions.count, 0)
+    function test_emptyPasswordIsSentToo() {
+        // accounts without a password, and fingerprint readers, log in with Enter alone
+        login.calm = true
+        verify(login.submit(""))
+        compare(fake.logins, [{ user: "user", password: "", session: 1 }])
     }
     function test_busyIgnoresAnotherSubmit() {
         verify(login.submit("meow"))
@@ -86,12 +87,14 @@ TestCase {
         compare(fake.logins.length, 0)
         compare(login.stage, LoginController.Stage.Idle)
     }
-    function test_failureWhileExplodingDropsThePassword() {
+    function test_staleFailureDuringTheNextTryIsIgnored() {
+        // nothing has been sent yet, so a failure now answers an older try
         login.submit("meow")
         fake.loginFailed()
-        compare(login.pending, "")
+        compare(failures.count, 0)
+        compare(login.stage, LoginController.Stage.Exploding)
         login.explosionFinished()
-        compare(fake.logins.length, 0, "a late explosion sends nothing")
+        compare(fake.logins, [{ user: "user", password: "meow", session: 1 }])
     }
     function test_nobodyToLogInIsIgnored() {
         login.user = ""

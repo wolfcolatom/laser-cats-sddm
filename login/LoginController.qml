@@ -34,7 +34,9 @@ QtObject {
 
     // false if it was ignored (already logging in, or nothing typed)
     function submit(password: string): bool {
-        if (busy || password === "" || user === "") return false
+        // (an empty password is sent like any other: accounts without one,
+        // and fingerprint readers, log in that way)
+        if (busy || user === "") return false
         message = ""
         rejected = false
         // who and where are fixed now: a list changed while the explosion
@@ -80,9 +82,10 @@ QtObject {
         // accepted: the display manager closes the screen; nothing more to do
         function onLoginSucceeded() { controller.watchdog.stop() }
         function onLoginFailed() {
-            // an answer after the wait was given up: the field is already
-            // back, and what has been typed since must not be thrown away
-            if (!controller.busy) return
+            // only an answer to a password that was sent counts. One that
+            // turns up after the wait was given up belongs to an old try:
+            // the field is back, and what has been typed since stays
+            if (controller.stage !== LoginController.Stage.Waiting) return
             controller.watchdog.stop()
             controller.pending = ""
             controller.stage = LoginController.Stage.Idle

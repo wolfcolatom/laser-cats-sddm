@@ -43,7 +43,8 @@ scale with its height. On several screens the sky shows on all of them and
 the login controls on the primary one.
 
 With one account the screen shows its name; with several, a list; and if
-SDDM lists none (network accounts, hidden users), a field to type it.
+SDDM lists none, a field to type it. Set `askUsername=true` to always get
+the field (for network accounts SDDM doesn't list).
 
 ## Changes
 
@@ -144,6 +145,8 @@ calm=true
   [Qt's format](https://doc.qt.io/qt-6/qml-qtqml-date.html#format-strings)
   (for example `HH:mm` and `dddd d MMMM`). Empty (the default) follows your
   language and 12/24-hour setting.
+- `askUsername`: `true` shows a field to type the username instead of
+  SDDM's list of users (for network accounts it doesn't list).
 - `keyboard`: `true` adds an on-screen keyboard button, for touch screens.
   It needs `qt6-virtualkeyboard` and `InputMethod=qtvirtualkeyboard` in
   SDDM's own settings (`/etc/sddm.conf.d/`).

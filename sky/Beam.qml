@@ -51,10 +51,10 @@ Item {
             strokeColor: "transparent"
             fillGradient: LinearGradient {
                 x1: 0; y1: 0; x2: beam.len; y2: 0
-                GradientStop { position: 0.0; color: Qt.rgba(0.95, 0.96, 0.95, 0.95) }
-                GradientStop { position: 0.18; color: Qt.rgba(beam.colour.r, beam.colour.g, beam.colour.b, 0.8) }
-                GradientStop { position: 0.75; color: Qt.rgba(beam.colour.r, beam.colour.g, beam.colour.b, 0.5) }
-                GradientStop { position: 1.0; color: Qt.rgba(beam.colour.r, beam.colour.g, beam.colour.b, 0.0) }   // fades into the surface
+                GradientStop { position: 0.0; color: Theme.faded(Theme.white, 0.95) }
+                GradientStop { position: 0.18; color: Theme.faded(beam.colour, 0.8) }
+                GradientStop { position: 0.75; color: Theme.faded(beam.colour, 0.5) }
+                GradientStop { position: 1.0; color: Theme.clear(beam.colour) }   // fades into the surface
             }
             startX: 0; startY: beam.height / 2 - 2
             PathLine { x: beam.len; y: beam.height / 2 - beam.spread }
@@ -68,7 +68,7 @@ Item {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: Theme.white }
-            GradientStop { position: 0.6; color: Qt.rgba(1, 1, 1, 0.35) }
+            GradientStop { position: 0.6; color: Theme.faded(Theme.white, 0.35) }
             GradientStop { position: 1.0; color: "transparent" }
         }
     }

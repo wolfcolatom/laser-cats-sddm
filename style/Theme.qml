@@ -7,6 +7,7 @@ import QtQuick
 QtObject {
     // the sky
     readonly property color jade: "#43af9c"         // lasers, constellation lines
+    readonly property color jadeDeep: "#328f7e"     // the comet's tail
     readonly property color mint: "#8dd2c6"         // lasers, star trails, glows, the date
     readonly property color amber: "#dfa33a"        // lasers, fire, warnings, the wrong-password wash
     readonly property color amberDeep: "#a86b00"    // the far end of the password field's edge

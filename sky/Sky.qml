@@ -50,7 +50,6 @@ Item {
     //   rewind()        the login screen blows up before it knows the password
     //                   is right; if it was wrong, everything flies back,
     //                   washed amber for a moment (amber = needs attention)
-    //                   together, washed amber
     property real flash: 0
     property real alarm: 0
     property real warp: 0
@@ -131,7 +130,6 @@ Item {
     }
     ShootingStars { running: root.running && !root.calm; active: root.live && !root.calm; seed: root.seed + 3 }
     Comet {
-        id: comet
         running: root.running && !root.calm; active: root.live && !root.calm
         seed: root.seed + 4
         areaWidth: root.width; areaHeight: root.height

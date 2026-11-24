@@ -94,9 +94,9 @@ the primary screen; only that one shows the login controls.
 
 | | |
 |---|---|
-| `tests/` | Qt Quick Test: the controller, the settings, the whole screen driven by keys against the fake backend, the cat data, colour contrast, the random numbers |
+| `tests/` | Qt Quick Test: the controller, the settings, the date in each language, the whole screen driven by keys against the fake backend, the cat data, colour contrast, the random numbers |
 | `ci/visual.qml` | seven reference pictures (sky idle, explosion, warp; four login screens), compared pixel by pixel |
-| `ci/smoke.qml` | the real `Main.qml`, headless: normal, calm, software-rendered, HiDPI, right-to-left, on-screen keyboard |
+| `ci/smoke.qml` | the real `Main.qml`, headless: normal, calm, HiDPI, right-to-left, on-screen keyboard |
 | `make smoke-gl` | the same run drawn with OpenGL on a virtual display, as on a real login screen |
 | `make greeter` | the theme loaded by the real `sddm-greeter-qt6` |
 

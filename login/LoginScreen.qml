@@ -29,8 +29,8 @@ Rectangle {
     readonly property bool primary: backend.primary
 
     // who is logging in: picked from the display manager's list, or typed
-    // if it lists nobody (network accounts, hidden users)
-    readonly property bool typedUser: userPicker.count === 0
+    // if it lists nobody or askUsername is set (network accounts, hidden users)
+    readonly property bool typedUser: settings.askUsername || userPicker.count === 0
 
     LoginController {
         id: login
@@ -104,23 +104,23 @@ Rectangle {
             // who's logging in: with one account just the name; with several, a
             // list to pick from; with none listed, a field to type it
             Text {
-                visible: userPicker.count === 1
+                visible: !screen.typedUser && userPicker.count === 1
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: Theme.subtext
-                font { pixelSize: 18; weight: Font.DemiBold }
+                font { pixelSize: 18; weight: Font.Medium }
                 text: login.user
             }
             PillComboBox {
                 id: userPicker
                 objectName: "userPicker"
                 Accessible.name: qsTr("User")
-                visible: count > 1
+                visible: !screen.typedUser && count > 1
                 anchors.horizontalCenter: parent.horizontalCenter
                 solid: false; centred: true; accent: settings.accent
                 model: screen.backend.users
                 currentIndex: Math.max(0, screen.backend.lastUserIndex)
                 width: Math.max(160, labelWidth + 64); height: 34
-                font { pixelSize: 18; weight: Font.DemiBold }
+                font { pixelSize: 18; weight: Font.Medium }
                 enabled: !login.busy
                 onActivated: { password.text = ""; password.forceActiveFocus() }
             }

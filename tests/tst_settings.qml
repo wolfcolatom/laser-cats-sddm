@@ -47,6 +47,11 @@ TestCase {
         compare(settings.classicCats, d.on)
         compare(settings.keyboard, d.on)
     }
+    function test_askUsername() {
+        verify(!settings.askUsername)
+        settings.source = { askUsername: "true" }
+        verify(settings.askUsername)
+    }
     function test_formatsAndAccent() {
         settings.source = { timeFormat: " HH:mm ", dateFormat: "d MMMM", accent: "#ff0000" }
         compare(settings.timeFormat, "HH:mm")

@@ -18,6 +18,7 @@ QtObject {
                               : text("calm") === "false" ? Settings.Calm.Never : Settings.Calm.Auto
     readonly property bool classicCats: flag("classic")     // the GIF cats from get-cats.sh
     readonly property bool keyboard: flag("keyboard")       // offer the on-screen keyboard
+    readonly property bool askUsername: flag("askUsername") // a field for the name, not the list
     readonly property string timeFormat: text("timeFormat") // "" = the system's
     readonly property string dateFormat: text("dateFormat")
     readonly property color accent: colour("accent", Theme.jade)
