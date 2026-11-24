@@ -19,27 +19,33 @@ Item {
     readonly property string dateText: Qt.locale().toString(now, dateFormat !== "" ? dateFormat
         : withoutYear(Qt.locale().dateFormat(Locale.LongFormat)))
 
-    // A Qt date format with the year taken out, along with the words and
-    // punctuation that joined it to its neighbour:
-    //   "dddd, d 'de' MMMM 'de' yyyy" -> "dddd, d 'de' MMMM"
-    //   "d MMMM yyyy 'г'."            -> "d MMMM"
-    //   "yyyy年M月d日dddd"             -> "M月d日dddd"
+    // A Qt date format with the year taken out, along with the words that
+    // belong to it, leaving one separator where it was:
+    //   "dddd, d 'de' MMMM 'de' yyyy"  -> "dddd, d 'de' MMMM"
+    //   "d MMMM yyyy 'г'."             -> "d MMMM"
+    //   "yyyy年M月d日dddd"              -> "M月d日dddd"
+    //   "dddd, yyyy. 'gada' d. MMMM"   -> "dddd, d. MMMM"
     function withoutYear(format: string): string {
         // fields (a run of one letter) and the text between them (quoted or not)
         const parts = format.match(/([a-zA-Z])\1*|'[^']*'|[^a-zA-Z']+/g) ?? []
         const isField = part => /^[a-zA-Z]/.test(part)
+        const isQuoted = part => part.charAt(0) === "'"
         const year = parts.findIndex(part => /^y+$/.test(part))
         if (year < 0) return format
         // the text either side of the year, up to the neighbouring fields
         let from = year, to = year
         while (from > 0 && !isField(parts[from - 1])) from--
         while (to < parts.length - 1 && !isField(parts[to + 1])) to++
-        const first = from === 0, last = to === parts.length - 1
-        // at the start it goes with what follows it, at the end with all
-        // around it, in the middle with what comes before it
-        const cutFrom = first ? 0 : from
-        const cutTo = first || last ? to : year
-        return parts.slice(0, cutFrom).concat(parts.slice(cutTo + 1)).join("").trim()
+        // the year's own words: quoted ones between it and those fields
+        let start = year, end = year
+        for (let i = from; i < year; i++) if (isQuoted(parts[i])) { start = i; break }
+        for (let i = to; i > year; i--) if (isQuoted(parts[i])) { end = i; break }
+        // what is left either side; in the middle of a date one of them
+        // stays to join the neighbours: the one with punctuation in it
+        const before = parts.slice(from, start).join(""), after = parts.slice(end + 1, to + 1).join("")
+        const inTheMiddle = from > 0 && to < parts.length - 1
+        const joint = !inTheMiddle ? "" : /\S/.test(after) || !/\S/.test(before) ? after : before
+        return parts.slice(0, from).concat([joint], parts.slice(to + 1)).join("").trim()
     }
     readonly property real timeBottom: time.height
 

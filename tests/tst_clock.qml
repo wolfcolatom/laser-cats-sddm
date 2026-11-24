@@ -24,7 +24,11 @@ TestCase {
             { tag: "zh_CN", format: "yyyy年M月d日dddd", expect: "M月d日dddd" },
             { tag: "ko", format: "yyyy년 M월 d일 dddd", expect: "M월 d일 dddd" },
             { tag: "hu", format: "yyyy. MMMM d., dddd", expect: "MMMM d., dddd" },
+            { tag: "lv", format: "dddd, yyyy. 'gada' d. MMMM", expect: "dddd, d. MMMM" },
+            { tag: "tt", format: "d MMMM yyyy 'ел', dddd", expect: "d MMMM, dddd" },
             { tag: "year in the middle", format: "d MMMM yyyy, dddd", expect: "d MMMM, dddd" },
+            { tag: "year in the middle, comma before", format: "MMMM d, yyyy dddd", expect: "MMMM d, dddd" },
+            { tag: "its word before it, in the middle", format: "d 'de' MMMM 'de' yyyy, dddd", expect: "d 'de' MMMM, dddd" },
             { tag: "two-digit year", format: "dddd d/M/yy", expect: "dddd d/M" },
             { tag: "no year", format: "dddd d MMMM", expect: "dddd d MMMM" },
             { tag: "a y inside quotes is not a year", format: "d 'day' MMMM yyyy", expect: "d 'day' MMMM" }
@@ -35,7 +39,8 @@ TestCase {
     // and against the locale data this Qt has: no year, nothing left dangling
     function test_everyShippedLanguage_data() {
         return ["en_US", "en_GB", "de_DE", "es_ES", "fr_FR", "it_IT", "ja_JP", "nl_NL", "pl_PL", "pt_BR",
-                "ru_RU", "zh_CN", "ko_KR", "hu_HU", "he_IL", "ar_EG", "tr_TR", "sv_SE"].map(name => ({ tag: name }))
+                "ru_RU", "zh_CN", "ko_KR", "hu_HU", "he_IL", "ar_EG", "tr_TR", "sv_SE", "lv_LV", "tt_RU",
+                "fi_FI", "cs_CZ", "el_GR", "uk_UA", "lt_LT", "eu_ES", "ca_ES", "th_TH", "vi_VN", "hi_IN"].map(name => ({ tag: name }))
     }
     function test_everyShippedLanguage(d) {
         const locale = Qt.locale(d.tag)

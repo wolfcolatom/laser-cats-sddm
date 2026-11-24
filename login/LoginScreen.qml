@@ -118,7 +118,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 solid: false; centred: true; accent: settings.accent
                 model: screen.backend.users
-                currentIndex: Math.max(0, screen.backend.lastUserIndex)
+                currentIndex: Math.min(Math.max(0, screen.backend.lastUserIndex), count - 1)
                 width: Math.max(160, labelWidth + 64); height: 34
                 font { pixelSize: 18; weight: Font.Medium }
                 enabled: !login.busy
@@ -130,7 +130,7 @@ Rectangle {
                 visible: screen.typedUser
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: 46
-                enabled: !login.busy
+                enabled: !login.busy && screen.primary
                 accent: settings.accent
                 text: screen.backend.lastUser
                 placeholderText: qsTr("Username")
@@ -143,7 +143,8 @@ Rectangle {
                 objectName: "password"
                 anchors.horizontalCenter: parent.horizontalCenter
                 focus: true
-                enabled: !login.busy
+                // (not on a screen without the controls: Enter there must do nothing)
+                enabled: !login.busy && screen.primary
                 accent: settings.accent
                 capsLock: screen.backend.capsLock
                 placeholderText: login.rejected ? qsTr("Wrong password") : qsTr("Password")
@@ -206,7 +207,7 @@ Rectangle {
             width: 220; height: 40
             opensUp: true; accent: settings.accent
             model: screen.backend.sessions
-            currentIndex: Math.max(0, screen.backend.lastSession)
+            currentIndex: Math.min(Math.max(0, screen.backend.lastSession), count - 1)
             enabled: !login.busy
             font.pixelSize: 15
         }

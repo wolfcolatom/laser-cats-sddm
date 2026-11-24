@@ -41,10 +41,11 @@ Window {
         property bool canReboot: true
         property bool canPowerOff: true
         property int logins: 0
+        property string lastPassword: ""
         signal loginSucceeded()
         signal loginFailed()
         signal informationMessage(string message)
-        function login(user, password, session) { logins++; ok.start() }
+        function login(user, password, session) { logins++; lastPassword = password; ok.start() }
         function reboot() {}
         function powerOff() {}
     }
@@ -67,6 +68,7 @@ Window {
         interval: 4000          // the explosion and warp take 2.2 s before the login
         onTriggered: {
             if (sddm.logins !== 1) { console.error("smoke: login was not sent (" + sddm.logins + ")"); Qt.exit(1); return }
+            if (sddm.lastPassword !== "meow") { console.error("smoke: what was typed is not what was sent"); Qt.exit(1); return }
             const software = theme.GraphicsInfo.api === GraphicsInfo.Software
             if (win.glMode && software) { console.error("smoke: drawn by the software renderer, not a GPU API"); Qt.exit(1); return }
             console.log("smoke: ok" + (win.calmMode ? " (calm)" : "") + (software ? "" : " (drawn with a GPU API)"))

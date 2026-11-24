@@ -247,14 +247,16 @@ Item {
             wait(100)                           // (the column lays itself out on the next frame)
             compare(centre(), screen.width / 2)
         }
-        function test_shakeLeavesTheFieldInPlace() {
-            const x = field().x
+        function test_shakeMovesTheFieldAndPutsItBack() {
             fake.accept = false
             load({ calm: "true" })
+            const drawnAt = () => field().mapToItem(screen, 0, 0).x     // (where it is drawn, shake included)
+            const place = drawnAt()
             submit("nope")
-            tryVerify(() => field().placeholderText === "Wrong password")
-            wait(250)                           // (the shake is 150 ms)
-            compare(field().x, x)
+            tryVerify(() => drawnAt() !== place, 1000, "it shakes")
+            tryCompare(field(), "placeholderText", "Wrong password")
+            tryVerify(() => drawnAt() === place, 1000, "and ends where it started")
+            compare(field().x, field().parent.width / 2 - field().width / 2, "still centred in the layout")
         }
         function test_escapeClearsTheField() {
             type("ab")
@@ -315,6 +317,18 @@ Item {
             verify(!field().visible)
             verify(!part("restartButton").visible)
             verify(part("clockBlock").visible, "the clock shows on every screen")
+            keyClick(Qt.Key_Return)
+            keyClick("x"); keyClick(Qt.Key_Return)
+            wait(100)
+            compare(fake.logins.length, 0, "and nothing typed there logs anyone in")
+        }
+        function test_indexesOutOfRangeAreBroughtIn() {
+            fake.users = twoUsers
+            fake.lastUserIndex = 7; fake.lastSession = 9
+            load({ calm: "true" })
+            compare(controller().user, "grace", "the last one in the list")
+            submit("meow")
+            compare(fake.logins[0], { user: "grace", password: "meow", session: 1 })
         }
         function test_timeFormatSetting() {
             load({ timeFormat: "HH:mm" })
