@@ -28,11 +28,15 @@ WallpaperItem {
     // A maximised or fullscreen window covers the desktop: hold the sky
     // still, so nobody pays for an animation they can't see (unless
     // AlwaysAnimate). Held still, nothing in the sky draws a frame.
-    property bool covered: coverMonitor.item ? (coverMonitor.item as CoverMonitor).covered : false
+    property bool covered: coverMonitor ? coverMonitor.covered : false
     readonly property bool paused: covered && !alwaysAnimate
-    Loader {
-        id: coverMonitor
-        source: "CoverMonitor.qml"
+    // Created quietly: where Plasma's image-wallpaper module isn't installed
+    // it can't load, and the sky just keeps running (a Loader would log
+    // that as an error). Plasma and Plasma Login Manager both have it.
+    property var coverMonitor: null
+    Component.onCompleted: {
+        const component = Qt.createComponent("CoverMonitor.qml")
+        if (component.status === Component.Ready) coverMonitor = component.createObject(wallpaper)
     }
 
     Rectangle {

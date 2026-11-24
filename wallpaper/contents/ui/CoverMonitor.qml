@@ -5,9 +5,9 @@
 // wallpaper uses to pause animated pictures (org.kde.image,
 // AnimatedImageComponent.qml).
 //
-// main.qml loads this with a Loader: where Plasma's image-wallpaper module
-// or KWindowSystem isn't there (a login screen, a test), it fails to load
-// on its own and the sky simply keeps running.
+// main.qml creates this on its own: where Plasma's image-wallpaper module
+// or KWindowSystem isn't installed, it fails to load quietly and the sky
+// simply keeps running.
 import QtQuick
 import QtQuick.Window
 import org.kde.plasma.wallpapers.image as PlasmaWallpaper
