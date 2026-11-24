@@ -10,6 +10,12 @@ with the right password and the planets explode, the cats are flung off
 screen, a roaring neon vortex cat appears, and everything warps away into your
 session.
 
+![Laser Cats: logging in](docs/login.gif)
+
+| Waiting for you | The planets blow up | The warp |
+|---|---|---|
+| ![idle](preview.jpg) | ![explosion](docs/explosion.jpg) | ![warp](docs/warp.jpg) |
+
 **Classic cats (optional).** Before 1.4 the theme used cats cut out of GIFs
 on GIPHY. Their artists haven't licensed them for sharing, so they aren't in
 this package, but `get-cats.sh` can download the GIFs from GIPHY and make the
@@ -62,7 +68,23 @@ them by itself. See "Classic cats" below.
 
 ## Install
 
+The easy way: System Settings → Colors & Themes → Login Screen (SDDM) →
+Get New… → search "Laser Cats" ([KDE Store page](https://store.kde.org/p/2382576)).
+
+From GitHub, with git:
+
 ```
+sudo git clone https://github.com/wolfcolatom/laser-cats-sddm.git /usr/share/sddm/themes/laser-cats
+printf '[Theme]\nCurrent=laser-cats\n' | sudo tee /etc/sddm.conf.d/laser-cats.conf
+```
+
+Update it later with `sudo git -C /usr/share/sddm/themes/laser-cats pull`.
+
+Or from a release archive
+([releases](https://github.com/wolfcolatom/laser-cats-sddm/releases)):
+
+```
+tar -xzf laser-cats-sddm-1.5.tar.gz
 sudo cp -r laser-cats /usr/share/sddm/themes/
 printf '[Theme]\nCurrent=laser-cats\n' | sudo tee /etc/sddm.conf.d/laser-cats.conf
 ```
