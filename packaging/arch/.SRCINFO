@@ -17,6 +17,6 @@ pkgbase = sddm-theme-laser-cats
 	optdepends = python-numpy: get-cats.sh
 	backup = usr/share/sddm/themes/laser-cats/theme.conf
 	source = sddm-theme-laser-cats-1.7.tar.gz::https://github.com/wolfcolatom/laser-cats-sddm/archive/refs/tags/v1.7.tar.gz
-	sha256sums = SKIP
+	sha256sums = a74c630ee8ad66aed056277ef5fed2ebc890086b41cf7972a26cd5a69bd61908
 
 pkgname = sddm-theme-laser-cats
