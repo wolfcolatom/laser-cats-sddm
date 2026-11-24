@@ -39,14 +39,14 @@ TestCase {
     }
     function test_everyShippedLanguage(d) {
         const locale = Qt.locale(d.tag)
-        const long = locale.dateFormat(Locale.LongFormat)
-        const format = clock.withoutYear(long)
+        const full = locale.dateFormat(Locale.LongFormat)
+        const format = clock.withoutYear(full)
         const text = locale.toString(clock.now, format)
         verify(!/y/.test(format.replace(/'[^']*'/g, "")), "a year field is left in " + format)
         verify(text.indexOf("2026") < 0, "the year is in: " + text)
         // it ends with a day or month, or text that belongs to one (日, 일),
         // never a joining word or punctuation left over from the year
         const tail = format.slice(format.search(/[dM][^dM]*$/) + 1)
-        verify(tail.length <= 2 && !/[',\s]/.test(tail), "'" + long + "' left '" + format + "'")
+        verify(tail.length <= 2 && !/[',\s]/.test(tail), "'" + full + "' left '" + format + "'")
     }
 }
