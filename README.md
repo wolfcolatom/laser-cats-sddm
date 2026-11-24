@@ -102,7 +102,9 @@ screen. Use it for **Plasma Login Manager** (KDE's newer login manager,
 which takes Plasma wallpapers instead of SDDM themes), or as your Plasma
 desktop or lock screen wallpaper. A wallpaper doesn't know when you press
 Enter, so there is no explosion or warp: the cats float and the planet cats
-fire their lasers.
+fire their lasers. Plasma Login Manager draws its own clock, user picture
+and password field on top (and blurs the wallpaper while you type), so the
+theme's own login screen doesn't carry over: for that, use SDDM.
 
 Install it for everyone (Plasma Login Manager only sees wallpapers
 installed this way):
