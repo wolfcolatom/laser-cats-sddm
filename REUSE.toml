@@ -8,7 +8,7 @@ path = [
     "docs/**", "ci/golden/*.png",
     "translations/*.ts", "translations/*.qm",
     "*.md", "**/*.md", ".gitignore", "theme.conf", "metadata.desktop",
-    ".github/ISSUE_TEMPLATE/*.yml",
+    ".github/ISSUE_TEMPLATE/*.yml", "packaging/arch/.SRCINFO",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 tom"
