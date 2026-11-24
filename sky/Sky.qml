@@ -112,6 +112,7 @@ Item {
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
         layer.effect: FlashEffect { flash: root.flash; alarm: root.alarm }
         rhythm: 2.3
+        roarOffset: 0.5                             // roars half a beat after the other one
         planet: "../assets/planet-earth.png"       // an Earth-style planet on this side
         // 60% size and mirrored (faces the other way): mirror about its middle,
         // then shrink from its top-left corner, so it covers homeX .. homeX + 276

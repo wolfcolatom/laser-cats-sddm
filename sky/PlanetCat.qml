@@ -26,6 +26,8 @@ Item {
     property real homeX: 0              // where it floats around
     property real homeY: 0
     property real rhythm: 0             // gives each copy its own floating rhythm
+    property real roarOffset: 0         // 0-1: how far into its animation it starts, so
+                                        // two copies of an animated cat don't roar together
 
     // tuning
     readonly property int fireballMinMs: 240        // a fireball every 0.24-0.76 s
@@ -78,6 +80,8 @@ Item {
         visible: planetCat.cat.animated
         asynchronous: true
         playing: planetCat.active
+        onStatusChanged: if (status === AnimatedImage.Ready && frameCount > 0)
+                             currentFrame = Math.floor(planetCat.roarOffset * frameCount) % frameCount
         source: planetCat.cat.animated ? "../assets/" + planetCat.cat.file : ""
         x: planetCat.cat.x; y: planetCat.cat.y - planetCat.e * 260
         width: sourceSize.width * planetCat.cat.scale; height: sourceSize.height * planetCat.cat.scale
