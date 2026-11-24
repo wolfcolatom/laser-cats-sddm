@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: an SDDM login screen. An animated space sky (Sky.qml), a
 // clock, the password field, a session picker and power buttons.
 pragma ComponentBehavior: Bound
@@ -15,7 +17,7 @@ Rectangle {
     readonly property color accent: config.accent || "#43af9c"
     readonly property color text: "#f2f4f3"
     readonly property color subtext: "#8a958e"
-    readonly property string font: "Adwaita Sans"
+    // the text uses the system's own font (no family set), except the clock
     // Space Grotesk (SIL Open Font License, assets/OFL-SpaceGrotesk.txt) for the clock and date
     FontLoader { id: clockFont; source: "assets/SpaceGrotesk.ttf" }
     readonly property bool lasers: true
@@ -73,6 +75,8 @@ Rectangle {
         visible: root.lasers
         jadeNebula: true
         calm: root.calm
+        // the classic GIF cats, once get-cats.sh has made them (it sets classic=true)
+        classic: String(config.classic) === "true"
     }
 
     // the clock, date and password clear away as the planets blow up,
@@ -149,7 +153,7 @@ Rectangle {
             visible: userPicker.count <= 1
             anchors.horizontalCenter: parent.horizontalCenter
             color: root.subtext
-            font { family: root.font; pixelSize: 18; weight: Font.DemiBold }
+            font { pixelSize: 18; weight: Font.DemiBold }
             text: root.user
         }
         ComboBox {
@@ -161,7 +165,7 @@ Rectangle {
             textRole: "name"
             currentIndex: Math.max(0, userModel.lastIndex)
             width: Math.max(160, nameLabel.implicitWidth + 64); height: 34
-            font { family: root.font; pixelSize: 18; weight: Font.DemiBold }
+            font { pixelSize: 18; weight: Font.DemiBold }
             Component.onCompleted: if (count > 1 && currentText !== "") root.user = currentText
             onActivated: { root.user = currentText; password.text = ""; password.forceActiveFocus() }
             contentItem: Text {
@@ -212,7 +216,7 @@ Rectangle {
             color: root.text
             placeholderText: qsTr("Password")
             placeholderTextColor: root.subtext
-            font { family: root.font; pixelSize: 18 }
+            font { pixelSize: 18 }
             // dark surface inside a jade -> amber edge,
             // a little brighter while the field has focus
             background: Rectangle {
@@ -247,7 +251,7 @@ Rectangle {
             visible: keyboard.capsLock
             text: qsTr("Caps Lock is on")
             color: "#dfa33a"
-            font { family: root.font; pixelSize: 15 }
+            font { pixelSize: 15 }
         }
     }
 
@@ -260,7 +264,7 @@ Rectangle {
         textRole: "name"
         currentIndex: root.session
         onActivated: root.session = currentIndex
-        font { family: root.font; pixelSize: 15 }
+        font { pixelSize: 15 }
         contentItem: Text {
             leftPadding: 18
             text: sessionPicker.displayText
@@ -325,7 +329,7 @@ Rectangle {
                     delay: 400
                     y: -implicitHeight - 8
                     x: (powerButton.width - implicitWidth) / 2
-                    contentItem: Text { text: powerButton.modelData.label; color: root.text; font { family: root.font; pixelSize: 14 } }
+                    contentItem: Text { text: powerButton.modelData.label; color: root.text; font { pixelSize: 14 } }
                     background: Rectangle { radius: 10; color: "#121513"; border.width: 1; border.color: "#2a302d" }
                     padding: 8; leftPadding: 12; rightPadding: 12
                 }

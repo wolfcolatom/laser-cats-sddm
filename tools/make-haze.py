@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Faint nebula haze for the Laser Cats sky, after the GIF's: soft clouds of
 dark green, brown and a little deep red, mostly empty black between. Two
 1920x1080 layers that tile side to side (they drift behind the stars).

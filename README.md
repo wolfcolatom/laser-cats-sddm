@@ -86,8 +86,9 @@ bash /usr/share/sddm/themes/laser-cats/get-cats.sh
 ```
 
 It downloads three GIFs from GIPHY, cuts the cats out and puts them in the
-theme's `assets` folder; the theme then uses them, with their own layout and
-lasers. To go back to the theme's own cats:
+theme's `assets` folder, then sets `classic=true` in the theme's
+`theme.conf.user` (SDDM's file for local settings); the theme then uses
+them, with their own layout and lasers. To go back to the theme's own cats:
 
 ```
 bash /usr/share/sddm/themes/laser-cats/get-cats.sh --remove

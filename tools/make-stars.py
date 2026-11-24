@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Star layers for the Laser Cats login screen: small horizontal pixel
 streaks like the GIF's stars, at its density and speeds, in the theme's colours
 (mint-white and grey-teal, some jade, amber where the GIF had red, soft gold,

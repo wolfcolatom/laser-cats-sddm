@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 """The laser-hands cat for Laser Cats ("Cat shoots beams over a city", GIPHY,
 creator unknown), cut out on its own: it rises from behind the planets.
 The cat doesn't move in the GIF (only its sky and beams change), so it is

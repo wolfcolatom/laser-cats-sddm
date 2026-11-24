@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: the starfield and nebula, drifting right in layers.
 pragma ComponentBehavior: Bound
 import QtQuick

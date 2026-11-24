@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Laser Cats: swap in the classic GIF cats (optional).
 #
 # The theme comes with its own cats. Before version 1.4 it used cats cut out
@@ -22,6 +24,8 @@
 #   /usr/share/sddm/themes/laser-cats). If that folder belongs to root, the
 #   cats are made as you and only the final copy asks for sudo.
 #   bash get-cats.sh --remove [THEME_DIR]   takes the cats out again.
+#   It switches the theme over by setting classic=true (or false) in the
+#   theme's theme.conf.user, SDDM's place for local settings.
 set -euo pipefail
 
 remove=0
@@ -36,14 +40,32 @@ as_owner() {        # run a command with sudo only if the theme folder isn't our
     if [ -w "$theme/assets" ]; then "$@"; else echo "(needs sudo to write to $theme)"; sudo "$@"; fi
 }
 
-if [ $remove = 1 ]; then
+# classic=true/false in theme.conf.user, keeping anything else in it
+set_classic() {
+    local f="$theme/theme.conf.user" tmp
+    tmp=$(mktemp)
+    if [ -f "$f" ]; then
+        awk -v v="$1" '/^\[General\]/ { print; if (!done) { print "classic=" v; done = 1 }; next }
+                       /^classic=/ { next }
+                       { print }
+                       END { if (!done) { print "[General]"; print "classic=" v } }' "$f" > "$tmp"
+    else
+        printf '[General]\nclassic=%s\n' "$1" > "$tmp"
+    fi
+    chmod 644 "$tmp"
+    as_owner cp "$tmp" "$f"
+    rm -f "$tmp"
+}
+
+if [ "$remove" = 1 ]; then
     for f in "${CATS[@]}"; do as_owner rm -f "$theme/assets/$f"; done
+    set_classic false
     echo "Classic cats removed from $theme: back to the theme's own cats."
     exit 0
 fi
 
 for c in curl magick python3; do
-    command -v $c >/dev/null || { echo "Missing: $c (see the top of this script for what to install)" >&2; exit 1; }
+    command -v "$c" >/dev/null || { echo "Missing: $c (see the top of this script for what to install)" >&2; exit 1; }
 done
 python3 -c "import numpy" 2>/dev/null || { echo "Missing: numpy for python3 (python-numpy / python3-numpy)" >&2; exit 1; }
 
@@ -112,6 +134,7 @@ EOF
 for f in "${CATS[@]}"; do [ -s "$work/out/$f" ] || { echo "Something went wrong: $f wasn't made." >&2; exit 1; }; done
 chmod 644 "$work/out/"*
 as_owner cp "${CATS[@]/#/$work/out/}" "$theme/assets/"
+set_classic true
 echo
 echo "Done: the classic cats are in $theme/assets and the theme will use them."
 echo "They're made from the artists' GIFs for your own use; please don't share them."

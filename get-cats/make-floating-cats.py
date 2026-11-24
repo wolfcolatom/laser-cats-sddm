@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Floating cats for Laser Cats, from "Major Lazer Cat" by Guldhart (GIPHY).
 Cuts two of the GIF's three cats out one by one (the top cat, the big middle
 one), keeping only their big shapes (the cat, its glow and lasers); the GIF's

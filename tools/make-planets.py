@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Planets for the Laser Cats sky, in the theme's colours: a jade gas giant with
 soft bands and a mint rim, an amber planet with a thin ring, a small mint
 moon. Lit from the upper left, with a faint glow around each. Transparent

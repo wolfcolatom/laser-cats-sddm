@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: a cat rising from behind a burning planet, firing lasers
 // from its paws that chip the planet, and the planet blowing up on login.
 pragma ComponentBehavior: Bound

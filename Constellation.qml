@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: a cat-head constellation drifting across the sky.
 pragma ComponentBehavior: Bound
 import QtQuick

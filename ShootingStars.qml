@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: shooting stars.
 pragma ComponentBehavior: Bound
 import QtQuick

@@ -1,4 +1,6 @@
 .pragma library
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // The theme's colours (used by Sky.qml and its parts).
 var jade = "#43af9c"       // lasers, constellation lines
 var mint = "#8dd2c6"       // lasers, star trails, glows

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats sky (used by Main.qml): a drifting starfield and nebula,
 // floating laser cats, two cats bursting out of burning planets, shooting
 // stars, and the explosion and warp played when you log in.
@@ -18,11 +20,10 @@ Item {
     // calm: no flashing on key presses, no shooting stars or comet (and the
     // login screen skips the explosion and warp)
     property bool calm: false
-    // "classic" cats: if get-cats.sh has been run, the original GIF cats
-    // (made from GIPHY GIFs on this computer) are used with their own layout;
-    // otherwise the theme's own cats. Checked once, straight away.
-    Image { id: classicProbe; visible: false; asynchronous: false; source: "assets/planet-cat.png" }
-    readonly property bool classic: classicProbe.status === Image.Ready
+    // "classic" cats: the original GIF cats (made from GIPHY GIFs on this
+    // computer by get-cats.sh, which sets classic=true in theme.conf.user),
+    // with their own layout; otherwise the theme's own cats
+    property bool classic: false
     // the cat set in use: pictures, sizes, paw and eye spots (Cats.js)
     readonly property var cats: classic ? Cats.classic : Cats.own
     // the jade nebula (in jade) instead of the olive haze

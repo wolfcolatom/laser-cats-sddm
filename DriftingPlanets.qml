@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: the far-off planets drifting slowly behind everything.
 pragma ComponentBehavior: Bound
 import QtQuick

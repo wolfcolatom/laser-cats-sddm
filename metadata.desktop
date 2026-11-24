@@ -8,3 +8,6 @@ MainScript=Main.qml
 ConfigFile=theme.conf
 QtVersion=6
 License=GPL-3.0-or-later
+Website=https://github.com/wolfcolatom/laser-cats-sddm
+Screenshot=preview.jpg
+TranslationsDirectory=translations

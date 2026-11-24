@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Laser Cats: warp speed after login: star streaks rushing out, and a cat
 // in the middle that fires its eye lasers.
 pragma ComponentBehavior: Bound

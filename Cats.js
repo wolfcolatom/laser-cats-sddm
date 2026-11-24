@@ -1,4 +1,6 @@
 .pragma library
+// SPDX-FileCopyrightText: 2026 tom
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Everything about the cat pictures, in one place: which file, how big it is
 // drawn, and where its paws and eyes are, so the lasers line up with them.
 // Positions are in the picture's own pixels unless noted. There are two sets:
