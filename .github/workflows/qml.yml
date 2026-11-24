@@ -34,7 +34,7 @@ jobs:
             echo "Server = https://archive.archlinux.org/repos/$SNAPSHOT/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
           fi
           pacman -Syyuu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats \
-            qt6-tools qt6-virtualkeyboard sddm imagemagick mesa xorg-server-xvfb git make
+            qt6-tools qt6-virtualkeyboard sddm libplasma imagemagick mesa xorg-server-xvfb git make
           pacman -Q qt6-base qt6-declarative sddm
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Versions agree
@@ -53,6 +53,8 @@ jobs:
         run: OUTDIR=visual-out make visual
       - name: Translations
         run: make i18n
+      - name: Plasma wallpaper (stand-in and real Plasma, kpackagetool6)
+        run: make test-wallpaper
       - name: The compiled translations in git are current
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"

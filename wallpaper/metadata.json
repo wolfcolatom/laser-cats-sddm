@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "tom"
+            }
+        ],
+        "Description": "Laser Cats' animated sky: laser-eyed kittens, roaring cats on burning planets, a drifting starfield",
+        "Icon": "preferences-desktop-wallpaper",
+        "Id": "org.wolfcolatom.lasercats",
+        "License": "GPL-3.0-or-later",
+        "Name": "Laser Cats",
+        "Version": "1.8",
+        "Website": "https://github.com/wolfcolatom/laser-cats-sddm"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

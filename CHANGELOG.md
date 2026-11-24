@@ -4,6 +4,17 @@ All notable changes to Laser Cats. Versions follow
 [semantic versioning](https://semver.org); the format follows
 [Keep a Changelog](https://keepachangelog.com).
 
+## [1.8] - 2026-11-24
+
+### Added
+- The sky as a Plasma wallpaper plugin (`org.wolfcolatom.lasercats`), for
+  Plasma Login Manager, which takes Plasma wallpapers instead of SDDM
+  themes, and for the Plasma desktop and lock screen. It is the same sky
+  as the login theme, without the explosion and warp (a wallpaper doesn't
+  know when a password goes in), with a Calm setting.
+  `make install-wallpaper`, or the `laser-cats-wallpaper` archive from the
+  release with `kpackagetool6`. The Arch package installs it too.
+
 ## [1.7.2] - 2026-11-24
 
 ### Fixed
@@ -176,6 +187,7 @@ Nothing looks different; this release is about how the theme is built.
 
 First release.
 
+[1.8]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.8
 [1.7.2]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7.2
 [1.7.1]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7.1
 [1.7]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7

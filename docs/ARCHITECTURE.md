@@ -43,6 +43,12 @@ login screen, and only one file knows there is an SDDM.
 
     style/Theme.qml             the colours, one singleton
 
+    wallpaper/                  the sky as a Plasma wallpaper plugin, for
+     ├─ metadata.json           Plasma Login Manager, the desktop and the
+     ├─ contents/ui/main.qml    lock screen: a WallpaperItem holding a Sky.
+     ├─ contents/ui/config.qml  `make wallpaper` copies sky/, style/ and
+     └─ contents/config/main.xml  assets/ in, so there is one sky to keep
+
 ## Time, chance and state
 
 One clock (`Sky.clock`, seconds since start, advanced every frame) drives
@@ -99,6 +105,7 @@ the primary screen; only that one shows the login controls.
 | `ci/smoke.qml` | the real `Main.qml`, headless: normal, calm, HiDPI, right-to-left, on-screen keyboard |
 | `make smoke-gl` | the same run drawn with OpenGL on a virtual display, as on a real login screen |
 | `make greeter` | the theme loaded by the real `sddm-greeter-qt6` |
+| `make test-wallpaper` | the wallpaper package loaded the way Plasma Login Manager loads one, with a stand-in for Plasma's `WallpaperItem` and, where libplasma is installed (CI), the real one, then installed with `kpackagetool6` |
 
 The headless checks draw with Qt's software renderer, which leaves out the
 glows, so the reference pictures show the layout and the sky but not those

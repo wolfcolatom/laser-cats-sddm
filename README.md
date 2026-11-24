@@ -95,6 +95,50 @@ Enter plays the explosion and then does nothing. That's expected.
 To go back to SDDM's default theme:
 `sudo rm /etc/sddm.conf.d/laser-cats.conf`
 
+## Plasma wallpaper (Plasma Login Manager, desktop, lock screen)
+
+The sky also comes as a standard Plasma wallpaper plugin, without the login
+screen. Use it for **Plasma Login Manager** (KDE's newer login manager,
+which takes Plasma wallpapers instead of SDDM themes), or as your Plasma
+desktop or lock screen wallpaper. A wallpaper doesn't know when you press
+Enter, so there is no explosion or warp: the cats float and the planet cats
+fire their lasers.
+
+Install it for everyone (Plasma Login Manager only sees wallpapers
+installed this way):
+
+```
+sudo make install-wallpaper
+```
+
+or from the release's `laser-cats-wallpaper-*.tar.gz`:
+
+```
+sudo kpackagetool6 --type Plasma/Wallpaper --global --install laser-cats-wallpaper-*.tar.gz
+```
+
+Then pick **Laser Cats** as the wallpaper in System Settings → Login Screen
+(for Plasma Login Manager), or in the desktop's or lock screen's wallpaper
+settings. For Plasma Login Manager it can also be set by hand in
+`/etc/plasmalogin.conf`:
+
+```
+[Greeter]
+WallpaperPluginId=org.wolfcolatom.lasercats
+```
+
+Its one setting, **Calm** (no shooting stars or comet), is in the wallpaper
+settings, or for Plasma Login Manager in `/etc/plasmalogin.conf`:
+
+```
+[Greeter][Wallpaper][org.wolfcolatom.lasercats][General]
+Calm=true
+```
+
+Without GPU acceleration the sky is held still. To remove it:
+`sudo make uninstall-wallpaper` (or `sudo kpackagetool6 --type
+Plasma/Wallpaper --global --remove org.wolfcolatom.lasercats`).
+
 ## Classic cats
 
 To use the original GIF cats instead of the theme's own (needs `curl`,
@@ -172,8 +216,10 @@ In short: `login/` is the login screen (and the one file that talks to
 SDDM), `sky/` the animated sky, one file per part, with every cat's picture
 and paw/eye positions in `sky/CatSets.qml`; `style/Theme.qml` holds the
 colours. `Main.qml` only joins them.
-`tools/` draws the stars, nebula and planets; `get-cats.sh` makes the
-optional classic cats; `tests/` and `ci/` hold the checks.
+`wallpaper/` wraps the same `sky/` as a Plasma wallpaper plugin (`make
+wallpaper` assembles it). `tools/` draws the stars, nebula and planets;
+`get-cats.sh` makes the optional classic cats; `tests/` and `ci/` hold the
+checks.
 
 ## Translations
 

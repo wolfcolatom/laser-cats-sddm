@@ -6,6 +6,8 @@
 #   make uninstall
 #   make check        lint, test, smoke, visual, translations (CI adds `make greeter`)
 #   make dist         the release archive, laser-cats-sddm-VERSION.tar.gz
+#   make wallpaper    the sky as a Plasma wallpaper package, in build/wallpaper/
+#                     (install-wallpaper, dist-wallpaper, test-wallpaper)
 #
 # The checks need Qt 6 (qt6-declarative, qt6-imageformats, qt6-svg,
 # qt6-tools) and ImageMagick 7. Install needs only coreutils: the compiled
@@ -27,6 +29,13 @@ DISTDIRS  := $(DIRS) tools
 QM        := $(patsubst %.ts,%.qm,$(wildcard translations/*.ts))
 LANGS     := $(basename $(notdir $(wildcard translations/*.ts)))
 
+# the Plasma wallpaper (for Plasma Login Manager, the desktop and the lock
+# screen): wallpaper/ plus the very same sky/, style/ and assets/
+WALLID    := org.wolfcolatom.lasercats
+WALLBUILD := build/wallpaper/$(WALLID)
+WALLDIR   := $(DESTDIR)$(PREFIX)/share/plasma/wallpapers/$(WALLID)
+
+.PHONY: wallpaper install-wallpaper uninstall-wallpaper dist-wallpaper test-wallpaper
 .PHONY: all install uninstall translations update-translations check versions lint test smoke smoke-gl greeter visual i18n dist clean
 
 all: translations
@@ -55,7 +64,7 @@ install:
 uninstall:
 	rm -rf $(THEMEDIR)
 
-check: versions lint test smoke visual translations i18n
+check: versions lint test smoke visual translations i18n test-wallpaper
 
 # the version is set in metadata.desktop; the PKGBUILD and changelog must agree,
 # and nothing else may spell one out
@@ -141,5 +150,49 @@ dist: translations
 	rm -rf build
 	@echo "built $(NAME)-sddm-$(VERSION).tar.gz"
 
+wallpaper:
+	rm -rf $(WALLBUILD) && mkdir -p $(WALLBUILD)
+	cp -r wallpaper/. $(WALLBUILD)/
+	cp -r sky style assets $(WALLBUILD)/contents/ui/
+	cp LICENSE $(WALLBUILD)/
+	sed -i 's/"Version": "[^"]*"/"Version": "$(VERSION)"/' $(WALLBUILD)/metadata.json
+	find $(WALLBUILD) -name __pycache__ -prune -exec rm -rf {} +
+	@echo "built $(WALLBUILD)"
+
+# system-wide: Plasma Login Manager's greeter runs as its own user and only
+# sees wallpapers installed for everyone
+install-wallpaper: wallpaper
+	install -d $(WALLDIR)
+	cp -r $(WALLBUILD)/. $(WALLDIR)/
+
+uninstall-wallpaper:
+	rm -rf $(WALLDIR)
+
+# for the KDE Store and `kpackagetool6 --type Plasma/Wallpaper --install`
+dist-wallpaper: wallpaper
+	tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='$(shell git log -1 --format=%cI 2>/dev/null || date -u +%FT%TZ)' \
+	    --mode='u+rwX,go+rX,go-w' -C build/wallpaper -cf - $(WALLID) | gzip -n -9 > $(NAME)-wallpaper-$(VERSION).tar.gz
+	@echo "built $(NAME)-wallpaper-$(VERSION).tar.gz"
+
+# loads the package the way Plasma Login Manager does, with a stand-in for
+# Plasma's WallpaperItem (ci/stubs); with the real Plasma too, and installs
+# it with KDE's own package tool, where libplasma is installed (as in CI).
+# Any QML warning fails it.
+HAVE_PLASMA := $(wildcard $(QMLDIR)/org/kde/plasma/plasmoid)
+KPKGTEST  := build/kpackage-test
+test-wallpaper: wallpaper
+	@for mode in normal calm; do \
+	  $(QML_ENV) timeout 60 $(QTBIN)/qml -I ci/stubs ci/wallpaper.qml -- $(abspath $(WALLBUILD)) $$mode > wallpaper.log 2>&1; s=$$?; cat wallpaper.log; \
+	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' wallpaper.log || exit 1; done
+	@$(QTBIN)/qmllint --max-warnings 0 -I $(abspath ci/stubs) $(abspath $(WALLBUILD)/contents/ui/main.qml) > /dev/null 2>&1 \
+	  && echo "wallpaper lint: no warnings" || { $(QTBIN)/qmllint -I $(abspath ci/stubs) $(abspath $(WALLBUILD)/contents/ui/main.qml); exit 1; }
+	$(if $(HAVE_PLASMA),@$(QML_ENV) timeout 60 $(QTBIN)/qml ci/wallpaper.qml -- $(abspath $(WALLBUILD)) plasma > wallpaper.log 2>&1; s=$$?; cat wallpaper.log; \
+	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' wallpaper.log,@echo "(libplasma not installed: not tried with the real Plasma)")
+	$(if $(HAVE_PLASMA),@rm -rf $(KPKGTEST) && mkdir -p $(KPKGTEST) \
+	  && XDG_DATA_HOME=$(abspath $(KPKGTEST)) kpackagetool6 --type Plasma/Wallpaper --install $(WALLBUILD) >/dev/null \
+	  && XDG_DATA_HOME=$(abspath $(KPKGTEST)) kpackagetool6 --type Plasma/Wallpaper --list | grep -q '$(WALLID)' \
+	  && echo "kpackagetool6: installs and lists as $(WALLID)",)
+	@rm -f wallpaper.log
+
 clean:
-	rm -rf build smoke.log greeter.log $(NAME)-sddm-*.tar.gz
+	rm -rf build smoke.log greeter.log wallpaper.log $(NAME)-sddm-*.tar.gz $(NAME)-wallpaper-*.tar.gz

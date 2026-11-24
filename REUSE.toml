@@ -7,7 +7,7 @@ path = [
     "assets/*.png", "assets/*.webp", "assets/*.svg", "preview.jpg",
     "docs/**", "ci/golden/*.png",
     "translations/*.ts", "translations/*.qm",
-    "*.md", "**/*.md", ".gitignore", "theme.conf", "metadata.desktop",
+    "*.md", "**/*.md", ".gitignore", "theme.conf", "metadata.desktop", "wallpaper/metadata.json",
     ".github/ISSUE_TEMPLATE/*.yml", "packaging/arch/.SRCINFO", "**/qmldir",
 ]
 precedence = "aggregate"

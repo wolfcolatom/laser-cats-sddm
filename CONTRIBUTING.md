@@ -23,6 +23,7 @@ on-screen keyboard, `qt6-virtualkeyboard`. On Arch:
 | `make visual` | renders the sky and the login screen at fixed moments and compares with `ci/golden/` |
 | `make translations` | compiles `translations/*.ts` and checks none are unfinished |
 | `make i18n` | every translation shows up on the login screen |
+| `make test-wallpaper` | the Plasma wallpaper package loads and runs (with real Plasma too, if libplasma is installed) |
 
 Two more that CI runs but `check` doesn't, because they need more
 installed: `make greeter` (SDDM) loads the theme under the real
