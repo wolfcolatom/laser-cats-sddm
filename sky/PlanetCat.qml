@@ -3,7 +3,7 @@
 // Laser Cats: a cat rising from behind a burning planet, firing lasers from
 // its paws that chip the planet, and the planet blowing up on login.
 //
-// The cat's picture, paws and beams come from Cats.js; the parts are
+// The cat's picture, paws and beams come from its PlanetCatSpec; the parts are
 // ChippedPlanet (the planet and its bites), Beam (each laser), Impact (the
 // little flash where a laser hits), PlanetFire (fire, smoke, debris) and
 // Explosion. Everything is laid out in a 460 x 520 box; Sky.qml places and
@@ -19,7 +19,7 @@ Item {
     required property real clock        // seconds since the sky started
     required property real boom         // 0 -> 1 when the right password goes in: the planet
                                         // blows apart and the cat is blasted away
-    required property var cat           // its picture, paws and beams (Cats.js)
+    required property PlanetCatSpec cat // its picture, paws and beams
     required property int seed          // for its random numbers
     Rng { id: chance; seed: planetCat.seed }
     property url planet: "../assets/planet-jade.png"   // or planet-earth.png
@@ -47,10 +47,11 @@ Item {
 
     // its paws in the box, following them frame by frame if it's animated,
     // so the beams start from them as they move
-    readonly property var paws: {
-        const f = cat.paws[cat.animated ? catPic.currentFrame : 0] || cat.paws[0]
-        return [Qt.point(cat.x + cat.scale * f[0][0], cat.y + cat.scale * f[0][1]),
-                Qt.point(cat.x + cat.scale * f[1][0], cat.y + cat.scale * f[1][1])]
+    readonly property int frame: cat.animated ? catPic.currentFrame : 0
+    readonly property list<point> paws: [inBox(cat.leftPaw), inBox(cat.rightPaw)]
+    function inBox(pawByFrame: list<point>): point {
+        const p = pawByFrame[Math.min(frame, pawByFrame.length - 1)]
+        return Qt.point(cat.x + cat.scale * p.x, cat.y + cat.scale * p.y)
     }
     property int phase: 0               // beam colours step round every 0.9 s
     Timer { interval: 900; repeat: true; running: planetCat.active; onTriggered: planetCat.phase = (planetCat.phase + 1) % 3 }
@@ -60,7 +61,7 @@ Item {
 
     // the cat, behind the planet: its face above it, its faded lower half
     // behind it; blasted up and away, tumbling, when the planet explodes.
-    // A still picture or an animation, whichever Cats.js gives.
+    // A still picture or an animation, whichever its spec says.
     Image {
         id: stillPic
         visible: !planetCat.cat.animated
@@ -103,19 +104,19 @@ Item {
         id: lasers
         model: planetCat.hasCat ? planetCat.cat.beams : []
         Beam {
-            required property var modelData
+            required property BeamSpec modelData
             required property int index
             from: planetCat.paws[modelData.paw]
             centre: planetCat.centre
             radius: planetCat.radius
-            angle: modelData.a
+            angle: modelData.angle
             sweep: modelData.sweep
             speed: modelData.speed
             phase: index
             clock: planetCat.clock
             colour: planetCat.colours[(index + planetCat.phase) % 3]
-            spreadBase: planetCat.cat.beamSpread.base
-            spreadGrowth: planetCat.cat.beamSpread.growth
+            spreadBase: planetCat.cat.spreadBase
+            spreadGrowth: planetCat.cat.spreadGrowth
             active: planetCat.active
             rng: chance
             fade: planetCat.e

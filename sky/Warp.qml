@@ -16,7 +16,7 @@ Item {
     required property real catScale     // 1 on a 1080 px tall screen
     required property bool playing      // the cat's animation plays (off while held still:
                                         // then it shows its last frame, the roar)
-    required property var cat           // the warp cat (Cats.js)
+    required property WarpCatSpec cat   // its picture and where its eyes are
     required property int seed          // for its random numbers
     Rng { id: rng; seed: warpScene.seed }
 
@@ -56,6 +56,7 @@ Item {
     // the roar.
     AnimatedImage {
         id: warpCat
+        objectName: "warpCat"
         z: 11
         readonly property real fadeIn: Math.max(Math.min(1, Math.max(0, warpScene.blast - 0.45) * 2.5), Math.min(1, warpScene.warp * 4))
         visible: opacity > 0.01
@@ -94,58 +95,29 @@ Item {
         readonly property real p: Math.max(0, Math.min(1, (warpScene.warp - 0.55) / 0.3))     // 0 -> 1 as it fires
         readonly property real fade: 1 - Math.max(0, warpScene.warp - 0.85) / 0.15
         visible: p > 0 && fade > 0 && warpCat.status === AnimatedImage.Ready   // no cat, no eye lasers
-        // an eye's place on screen: (fx, fy) is its offset from the image's
-        // centre (between the eyes) as a fraction of the image, turned and
-        // scaled with the cat
-        function eye(fx, fy) {
-            let s = warpCat.height * warpCat.scale, a = warpCat.rotation * Math.PI / 180
-            let dx = fx * s, dy = fy * s
+        // an eye's place on screen: `offset` is its distance from the
+        // picture's centre (between the eyes) as a fraction of the picture,
+        // turned and scaled with the cat
+        function onScreen(offset: point): point {
+            const s = warpCat.height * warpCat.scale, a = warpCat.rotation * Math.PI / 180
+            const dx = offset.x * s, dy = offset.y * s
             return Qt.point(warpScene.width / 2 + dx * Math.cos(a) - dy * Math.sin(a),
                             warpScene.height / 2 + dx * Math.sin(a) + dy * Math.cos(a))
         }
-        Repeater {
-            // one beam per eye (where the eyes are: Cats.js): jade to the
-            // left, amber to the right, each sweeping a little
-            model: [ { fx: warpScene.cat.eyes[0].x, fy: warpScene.cat.eyes[0].y, angle: 196, sweep: -14, col: Theme.jade },
-                     { fx: warpScene.cat.eyes[1].x, fy: warpScene.cat.eyes[1].y, angle: -16, sweep: 14, col: Theme.amber } ]
-            Item {
-                required property var modelData
-                id: shot
-                readonly property point at: warpLasers.eye(modelData.fx, modelData.fy)
-                readonly property real thick: (6 + 12 * warpLasers.p) * warpScene.catScale
-                readonly property real len: Math.sqrt(warpLasers.p) * warpScene.width * 0.75
-                readonly property real turn: modelData.angle + modelData.sweep * warpLasers.p
-                readonly property real show: warpLasers.fade * Math.min(1, warpLasers.p * 3)
-                Rectangle {                     // a soft halo around the beam
-                    x: shot.at.x; y: shot.at.y - height / 2
-                    width: shot.len; height: shot.thick * 3.5; radius: height / 2
-                    transformOrigin: Item.Left; rotation: shot.turn
-                    opacity: shot.show * 0.3
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: shot.modelData.col }
-                        GradientStop { position: 1.0; color: Theme.clear(shot.modelData.col) }
-                    }
-                }
-                Rectangle {                     // the beam: white-hot at the eye, then its colour, fading out
-                    x: shot.at.x; y: shot.at.y - height / 2
-                    width: shot.len; height: shot.thick; radius: height / 2
-                    transformOrigin: Item.Left; rotation: shot.turn
-                    opacity: shot.show
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: Theme.white }
-                        GradientStop { position: 0.12; color: shot.modelData.col }
-                        GradientStop { position: 1.0; color: Theme.clear(shot.modelData.col) }
-                    }
-                }
-                Image {                         // the flash in the eye
-                    source: "../assets/glow.png"
-                    width: 150 * warpScene.catScale * (0.5 + warpLasers.p); height: width
-                    x: shot.at.x - width / 2; y: shot.at.y - height / 2
-                    opacity: warpLasers.fade * Math.min(1, warpLasers.p * 4)
-                }
-            }
+        // jade from its left eye, amber from its right
+        EyeLaser {
+            objectName: "leftEyeLaser"
+            eye: warpLasers.onScreen(warpScene.cat.leftEye)
+            colour: Theme.jade; angle: 196; sweep: -14
+            progress: warpLasers.p; fade: warpLasers.fade
+            reach: warpScene.width * 0.75; catScale: warpScene.catScale
+        }
+        EyeLaser {
+            objectName: "rightEyeLaser"
+            eye: warpLasers.onScreen(warpScene.cat.rightEye)
+            colour: Theme.amber; angle: -16; sweep: 14
+            progress: warpLasers.p; fade: warpLasers.fade
+            reach: warpScene.width * 0.75; catScale: warpScene.catScale
         }
     }
 }

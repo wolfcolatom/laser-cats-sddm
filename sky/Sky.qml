@@ -5,8 +5,6 @@
 // stars, and the explosion and warp played when you log in.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "Cats.js" as Cats
-import "../style"
 
 Item {
     id: root
@@ -40,8 +38,9 @@ Item {
     // computer by get-cats.sh, which sets classic=true in theme.conf.user),
     // with their own layout; otherwise the theme's own cats
     property bool classic: false
-    // the cat set in use: pictures, sizes, paw and eye spots (Cats.js)
-    readonly property var cats: classic ? Cats.classic : Cats.own
+    // the cat set in use: pictures, sizes, paw and eye spots
+    CatSets { id: sets }
+    readonly property CatSet cats: classic ? sets.classic : sets.own
 
     // reactions (called by the login screen):
     //   keyPressed()    the cats and lasers flash a little brighter; every

@@ -3,7 +3,6 @@
 // Laser Cats: the laser cats floating across the sky.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "../style"
 
 // the floating cats, in one layer so they can flash brighter on a key
 // press and wash amber on a wrong password, all together
@@ -16,7 +15,7 @@ Item {
     required property real flash        // 0-1: brighter for a moment on a key press
     required property real alarm        // 0-1: washed amber on a wrong password
     required property real blast        // 0-1: the planets blowing up flings them away
-    required property var cats          // the floating cats to show (Cats.js)
+    required property list<FloatingCatSpec> cats    // the cats to show
     anchors.fill: parent
     layer.enabled: flash > 0.01 || alarm > 0.01
     layer.effect: FlashEffect { flash: catLayer.flash; alarm: catLayer.alarm }
@@ -26,21 +25,21 @@ Item {
     // face the other way. Each bobs and turns a little; their lasers are
     // part of their animation.
     Repeater {
-        model: catLayer.running ? catLayer.cats : []         // (lanes, sizes, speeds: Cats.js)
+        model: catLayer.running ? catLayer.cats : []
         AnimatedImage {
-            required property var modelData
+            required property FloatingCatSpec modelData
             required property int index
             asynchronous: true          // load in the background: the lock shows at once
             id: floater
             source: "../assets/" + modelData.file
-            width: sourceSize.width * modelData.s * catLayer.catScale; height: sourceSize.height * modelData.s * catLayer.catScale
+            width: sourceSize.width * modelData.size * catLayer.catScale; height: sourceSize.height * modelData.size * catLayer.catScale
             smooth: true
             mirror: modelData.mirror
             opacity: 0.95
             playing: catLayer.playing
             readonly property real t: catLayer.clock
             readonly property real baseX: (modelData.start * (catLayer.width + width) + floater.t * modelData.speed) % (catLayer.width + width) - width
-            readonly property real baseY: modelData.y * catLayer.height + 9 * Math.sin(floater.t * 0.8 + modelData.frame)
+            readonly property real baseY: modelData.lane * catLayer.height + 9 * Math.sin(floater.t * 0.8 + modelData.frame)
             // the planets blowing up fling it off the screen: outward from
             // the middle, spinning (blast 0 -> 1 over the explosion)
             readonly property real gust: Math.max(0, catLayer.blast)          // steady, so you see them go
