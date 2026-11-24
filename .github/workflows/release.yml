@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Pushing a tag like v1.6 builds the release archive, its checksums and a
+# build-provenance attestation, and publishes the GitHub release with that
+# version's notes from CHANGELOG.md.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install tools
+        run: pacman -Syu --noconfirm --needed qt6-tools git make tar gzip github-cli
+      - uses: actions/checkout@v4
+      - name: Check the tag matches the version
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          version=$(sed -n 's/^Version=//p' metadata.desktop)
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME but metadata.desktop says $version"; exit 1; }
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - name: Build
+        run: |
+          make dist
+          sha256sum "laser-cats-sddm-$VERSION.tar.gz" > SHA256SUMS
+          cat SHA256SUMS
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: laser-cats-sddm-${{ env.VERSION }}.tar.gz
+      - name: Release notes from CHANGELOG.md
+        run: awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md && cat notes.md
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "laser-cats-sddm-$VERSION.tar.gz" SHA256SUMS \
+            --title "Laser Cats $VERSION" --notes-file notes.md --verify-tag

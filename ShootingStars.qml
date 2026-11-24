@@ -4,16 +4,18 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import "Palette.js" as Palette
+import "Rng.js" as Rng
 
 Item {
     id: shootingStars
     anchors.fill: parent
-    property var sky                    // the Sky it belongs to (sizes, state)
+    required property bool running      // shown
+    required property bool active       // shooting now and then (off while held still)
 
     // shooting stars: three, each on its own timer (every 2-7 s), with
     // their own length, angle and speed; a mint trail to a white head
     Repeater {
-        model: shootingStars.sky.running ? 3 : 0
+        model: shootingStars.running ? 3 : 0
         Rectangle {
             required property int index
             id: shooting
@@ -44,15 +46,15 @@ Item {
                 }
             }
             Timer {
-                interval: 1500 + shooting.index * 1700; repeat: true; running: shootingStars.sky.running
+                interval: 1500 + shooting.index * 1700; repeat: true; running: shootingStars.active
                 onTriggered: {
-                    interval = 2000 + Math.random() * 5000
-                    shooting.width = 110 + Math.random() * 170
-                    shooting.rotation = 8 + Math.random() * 28
-                    shooting.dist = 350 + Math.random() * 450
-                    shooting.time = 600 + Math.random() * 700
-                    shooting.x0 = Math.random() * shootingStars.sky.width * 0.85
-                    shooting.y0 = Math.random() * shootingStars.sky.height * 0.7
+                    interval = 2000 + Rng.next() * 5000
+                    shooting.width = 110 + Rng.next() * 170
+                    shooting.rotation = 8 + Rng.next() * 28
+                    shooting.dist = 350 + Rng.next() * 450
+                    shooting.time = 600 + Rng.next() * 700
+                    shooting.x0 = Rng.next() * shootingStars.width * 0.85
+                    shooting.y0 = Rng.next() * shootingStars.height * 0.7
                     shoot.start()
                 }
             }

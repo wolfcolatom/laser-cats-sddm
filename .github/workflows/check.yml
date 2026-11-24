@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2026 tom
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Checks on every push and pull request:
-#   qml     Qt 6 qmllint with no warnings allowed, then the theme loaded
-#           headless with a stand-in for SDDM (ci/smoke.qml), logging in
-#           both normally and in calm mode; any QML warning fails it
-#   scripts shellcheck on get-cats.sh, and the Python tools compile
+# Checks on every push and pull request (the same as `make check`):
+#   qml      qmllint (no warnings), the Qt Quick Test suites, headless runs
+#            (normal, calm, software renderer, HiDPI, right-to-left), the
+#            screenshot comparisons, and every translation
+#   scripts  shellcheck, the Python tools compile, REUSE licence info
 name: check
 
 on:
@@ -17,30 +17,36 @@ jobs:
     # Arch, for a current Qt 6 (the theme uses Qt 6.5+ QML features)
     container: archlinux:latest
     steps:
-      - name: Install Qt 6
-        run: pacman -Syu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats mesa ttf-dejavu git
+      - name: Install Qt 6 and tools
+        run: >
+          pacman -Syu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats
+          qt6-tools qt6-virtualkeyboard imagemagick mesa ttf-dejavu git make
       - uses: actions/checkout@v4
-      - name: qmllint
-        run: /usr/lib/qt6/bin/qmllint --max-warnings 0 *.qml ci/*.qml
-      - name: Smoke test (normal and calm)
-        env:
-          QT_QPA_PLATFORM: offscreen
-          QT_FORCE_STDERR_LOGGING: "1"
-          LIBGL_ALWAYS_SOFTWARE: "1"
-        run: |
-          for mode in normal calm; do
-            echo "== $mode"
-            timeout 60 /usr/lib/qt6/bin/qml ci/smoke.qml -- "$mode" 2>&1 | tee "smoke-$mode.log"
-            status=${PIPESTATUS[0]}
-            if [ "$status" != 0 ]; then echo "::error::smoke test ($mode) exited $status"; exit 1; fi
-            if grep -E '\.qml:[0-9]+' "smoke-$mode.log"; then echo "::error::QML warnings in the $mode run"; exit 1; fi
-          done
+      - name: Lint
+        run: make lint
+      - name: Unit tests
+        run: make test
+      - name: Headless runs
+        run: make smoke
+      - name: Screenshot comparisons
+        run: OUTDIR=visual-out make visual
+      - name: Translations
+        run: make i18n
+      - name: Keep the pictures if they differ
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-differences
+          path: visual-out/
+          if-no-files-found: ignore
 
   scripts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: shellcheck
-        run: shellcheck get-cats.sh
+        run: shellcheck get-cats.sh ci/compare.sh
       - name: Python tools compile
         run: python3 -m py_compile tools/*.py get-cats/*.py
+      - name: REUSE licence information
+        run: pipx run reuse lint

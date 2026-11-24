@@ -5,13 +5,17 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import "Palette.js" as Palette
+import "Rng.js" as Rng
 
 // a comet, every 25-50 s: a slow crossing with a long jade tail
 Item {
     id: comet
-    property var sky                    // the Sky it belongs to (sizes, state)
+    required property bool running      // shown
+    required property bool active       // crossing now and then (off while held still)
+    required property real areaWidth    // the sky it crosses
+    required property real areaHeight
     function show() { cometTimer.triggered() }     // (for testing)
-    visible: sky.running
+    visible: running
     width: 460; height: 14
     opacity: 0
     rotation: 12
@@ -36,8 +40,8 @@ Item {
     }
     ParallelAnimation {
         id: cometRun
-        NumberAnimation { target: comet; property: "x"; from: comet.x0; to: comet.x0 + comet.sky.width * 0.9; duration: 6500; easing.type: Easing.InOutSine }
-        NumberAnimation { target: comet; property: "y"; from: comet.y0; to: comet.y0 + comet.sky.width * 0.9 * Math.tan(comet.rotation * Math.PI / 180); duration: 6500; easing.type: Easing.InOutSine }
+        NumberAnimation { target: comet; property: "x"; from: comet.x0; to: comet.x0 + comet.areaWidth * 0.9; duration: 6500; easing.type: Easing.InOutSine }
+        NumberAnimation { target: comet; property: "y"; from: comet.y0; to: comet.y0 + comet.areaWidth * 0.9 * Math.tan(comet.rotation * Math.PI / 180); duration: 6500; easing.type: Easing.InOutSine }
         SequentialAnimation {
             NumberAnimation { target: comet; property: "opacity"; to: 0.9; duration: 1200 }
             PauseAnimation { duration: 4000 }
@@ -46,12 +50,12 @@ Item {
     }
     Timer {
         id: cometTimer
-        interval: 12000; repeat: true; running: comet.sky.running
+        interval: 12000; repeat: true; running: comet.active
         onTriggered: {
-            interval = 25000 + Math.random() * 25000
-            comet.rotation = 6 + Math.random() * 16
-            comet.x0 = -comet.width + Math.random() * comet.sky.width * 0.2
-            comet.y0 = Math.random() * comet.sky.height * 0.45
+            interval = 25000 + Rng.next() * 25000
+            comet.rotation = 6 + Rng.next() * 16
+            comet.x0 = -comet.width + Rng.next() * comet.areaWidth * 0.2
+            comet.y0 = Rng.next() * comet.areaHeight * 0.45
             cometRun.start()
         }
     }

@@ -1,0 +1,39 @@
+name: Bug report
+description: Something doesn't work or looks wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead. A photo of the screen helps.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Laser Cats version
+      placeholder: "1.6 (from metadata.desktop)"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Distribution, SDDM and Qt versions
+      placeholder: "Arch, SDDM 0.21, Qt 6.12"
+  - type: input
+    id: hardware
+    attributes:
+      label: Graphics and screens
+      placeholder: "Intel UHD 620, two screens, 1920x1080 at 125%"
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings
+      description: Anything you changed in theme.conf or theme.conf.user, and whether you ran get-cats.sh.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: "Errors from `journalctl -b -u sddm` or from `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/laser-cats`."
+      render: text

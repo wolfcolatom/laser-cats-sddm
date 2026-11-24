@@ -39,6 +39,7 @@ Window {
         property int logins: 0
         signal loginSucceeded()
         signal loginFailed()
+        signal informationMessage(string message)
         function login(user, password, session) { logins++; ok.start() }
         function reboot() {}
         function powerOff() {}

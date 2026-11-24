@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Maintainer: tom <262216049+wolfcolatom@users.noreply.github.com>
+pkgname=sddm-theme-laser-cats
+pkgver=1.6
+pkgrel=1
+pkgdesc="Laser Cats: an animated SDDM login theme - laser-eyed kittens, exploding planets and a warp when you log in"
+arch=(any)
+url="https://github.com/wolfcolatom/laser-cats-sddm"
+license=('GPL-3.0-or-later' 'OFL-1.1')
+depends=(sddm qt6-declarative qt6-imageformats qt6-svg)
+makedepends=(qt6-tools)
+optdepends=('qt6-virtualkeyboard: on-screen keyboard (keyboard=true in theme.conf)'
+            'curl: get-cats.sh (the optional classic cats)'
+            'imagemagick: get-cats.sh'
+            'python-numpy: get-cats.sh')
+backup=(usr/share/sddm/themes/laser-cats/theme.conf)
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "laser-cats-sddm-$pkgver"
+    make translations
+}
+
+check() {
+    cd "laser-cats-sddm-$pkgver"
+    grep -q "^Version=$pkgver$" metadata.desktop
+}
+
+package() {
+    cd "laser-cats-sddm-$pkgver"
+    make install DESTDIR="$pkgdir" PREFIX=/usr
+}

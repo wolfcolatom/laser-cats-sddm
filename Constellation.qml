@@ -9,14 +9,17 @@ import "Palette.js" as Palette
 // shape of a cat's head (ears, cheeks, chin, eyes, nose), drifting slowly
 Canvas {
     id: constellation
-    property var sky                    // the Sky it belongs to (sizes, state)
-    visible: sky.running
+    required property bool running     // shown
+    required property real clock       // seconds since the sky started
+    required property real catScale    // 1 on a 1080 px tall screen
+    required property real areaWidth   // the sky it drifts across
+    required property real areaHeight
+    visible: running
     width: 220; height: 200
-    transform: Scale { xScale: constellation.sky.catScale; yScale: constellation.sky.catScale }
-    property real t: 0                  // seconds it has been moving
-    FrameAnimation { running: constellation.sky.running; onTriggered: constellation.t += frameTime }
-    x: (0.10 * (sky.width + width) + constellation.t * 5) % (sky.width + width) - width
-    y: sky.height * 0.52
+    transform: Scale { xScale: constellation.catScale; yScale: constellation.catScale }
+    readonly property real span: areaWidth + width
+    x: (0.10 * span + clock * 5) % span - width       // 5 px a second
+    y: areaHeight * 0.52
     opacity: 0.85
     onPaint: {
         let c = getContext("2d")

@@ -8,6 +8,7 @@ import QtQuick
 import QtQuick.Effects
 import "Cats.js" as Cats
 import "Palette.js" as Palette
+import "Rng.js" as Rng
 
 Item {
     id: root
@@ -17,6 +18,23 @@ Item {
     // the two planet cats are drawn a bit bigger again on top of that
     readonly property real planetScale: catScale * 1.25
     property bool running: visible
+    // the clock everything drifts and floats by: seconds since the sky started
+    property real clock: 0
+    // hold still (for the screenshot tests): no clock, no random events, no
+    // animated pictures; set clock, blast and warp by hand
+    property bool frozen: false
+    readonly property bool live: running && !frozen
+    FrameAnimation { running: root.live; onTriggered: root.clock += frameTime }
+    // the random seed: a new one each time, or fixed for repeatable tests
+    property int seed: Math.floor(Math.random() * 2147483647)
+    Component.onCompleted: {
+        Rng.seed(seed)
+        // switch the flash effect on, invisibly faint, for a moment at the
+        // start, so Qt prepares it before the first key press rather than
+        // stuttering on it
+        if (!frozen) { flash = 0.02; warmUp.start() }
+    }
+    Timer { id: warmUp; interval: 500; onTriggered: if (!flashAnim.running) root.flash = 0 }
     // calm: no flashing on key presses, no shooting stars or comet (and the
     // login screen skips the explosion and warp)
     property bool calm: false
@@ -73,16 +91,16 @@ Item {
     clip: true
 
     // the parts, back to front (each in its own file)
-    Starfield { sky: root }
-    DriftingPlanets { sky: root }
-    // two of them: the big one upper left, a smaller mirrored one upper right
+    Starfield { running: root.running; clock: root.clock; jadeNebula: root.jadeNebula }
+    DriftingPlanets { running: root.running; clock: root.clock; catScale: root.catScale }
+    // two planet cats: the big one upper left, a smaller mirrored one upper
+    // right; in front of the floating cats, comet and shooting stars
     PlanetCat {
         id: planetLeft
-        sky: root
-        cat: root.cats.planetCat
-        z: 5                                    // in front of the floating cats, comet and shooting stars
-        live: root.running
+        z: 5
+        running: root.running; active: root.live; clock: root.clock
         boom: root.blast
+        cat: root.cats.planetCat
         // flashes on key presses / goes amber on a wrong password, like the floating cats
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
         layer.effect: MultiEffect { brightness: root.flash * 0.25; colorization: root.alarm * 0.75; colorizationColor: Palette.amber }
@@ -91,15 +109,13 @@ Item {
     }
     PlanetCat {
         id: planetRight
-        sky: root
-        cat: root.cats.planetCat
         z: 5
-        live: root.running
+        running: root.running; active: root.live; clock: root.clock
         boom: root.blast
-        // flashes on key presses / goes amber on a wrong password, like the floating cats
+        cat: root.cats.planetCat
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
         layer.effect: MultiEffect { brightness: root.flash * 0.25; colorization: root.alarm * 0.75; colorizationColor: Palette.amber }
-        seed: 2.3
+        rhythm: 2.3
         planet: "assets/planet-earth.png"       // an Earth-style planet on this side
         // 60% size and mirrored (faces the other way): mirror about its middle,
         // then shrink from its top-left corner, so it covers homeX .. homeX + 276
@@ -107,9 +123,24 @@ Item {
         homeX: root.width * 0.95 - width * 0.6 * root.planetScale; homeY: root.height * 0.04
         transform: [ Scale { origin.x: 230; xScale: -1 }, Scale { xScale: 0.6 * root.planetScale; yScale: 0.6 * root.planetScale } ]
     }
-    Constellation { sky: root }
-    FloatingCats { sky: root; cats: root.cats.floaters }
-    ShootingStars { sky: root; visible: !root.calm }
-    Comet { id: comet; sky: root; visible: !root.calm && root.running }
-    Warp { sky: root; cat: root.cats.warpCat }
+    Constellation {
+        running: root.running; clock: root.clock; catScale: root.catScale
+        areaWidth: root.width; areaHeight: root.height
+    }
+    FloatingCats {
+        running: root.running; playing: !root.frozen; clock: root.clock; catScale: root.catScale
+        flash: root.flash; alarm: root.alarm; blast: root.blast
+        cats: root.cats.floaters
+    }
+    ShootingStars { running: root.running && !root.calm; active: root.live && !root.calm }
+    Comet {
+        id: comet
+        running: root.running && !root.calm; active: root.live && !root.calm
+        areaWidth: root.width; areaHeight: root.height
+    }
+    Warp {
+        warp: root.warp; blast: root.blast; catScale: root.catScale
+        playing: !root.frozen
+        cat: root.cats.warpCat
+    }
 }

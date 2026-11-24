@@ -1,35 +1,36 @@
 // SPDX-FileCopyrightText: 2026 tom
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Laser Cats: the far-off planets drifting slowly behind everything.
+// Laser Cats: the far-off planets (an amber ringed planet, a small moon)
+// drifting right very slowly behind everything, each at its own speed.
 pragma ComponentBehavior: Bound
 import QtQuick
 
 Item {
     id: drifting
     anchors.fill: parent
-    property var sky                    // the Sky it belongs to (sizes, state)
 
-    // planets in jade and amber: a jade gas giant,
-    // an amber ringed planet, a small mint moon; drifting right very slowly,
-    // far behind the laser cats, each its own speed
+    required property bool running      // shown
+    required property real clock        // seconds since the sky started
+    required property real catScale     // 1 on a 1080 px tall screen
+
     Repeater {
-        model: drifting.sky.running ? [
+        // y: height (fraction of the screen); speed: px a second; start:
+        // where along its crossing it begins (0-1)
+        model: drifting.running ? [
             { file: "amber", y: 0.60, speed: 6, start: 0.72, opacity: 0.9 },
             { file: "moon",  y: 0.30, speed: 8, start: 0.47, opacity: 0.85 }
         ] : []
         Image {
-            required property var modelData
-            asynchronous: true          // load in the background: the lock shows at once
             id: planet
+            required property var modelData
+            asynchronous: true          // load in the background: the screen shows at once
             source: "assets/planet-" + modelData.file + ".png"
             smooth: true
             opacity: modelData.opacity
-            // sized for a 1080 px tall screen, like the cats
-            width: sourceSize.width * drifting.sky.catScale; height: sourceSize.height * drifting.sky.catScale
-            property real t: 0          // seconds it has been drifting
-            FrameAnimation { running: true; onTriggered: planet.t += frameTime }
-            x: (modelData.start * (drifting.sky.width + width) + planet.t * modelData.speed) % (drifting.sky.width + width) - width
-            y: modelData.y * drifting.sky.height
+            width: sourceSize.width * drifting.catScale; height: sourceSize.height * drifting.catScale
+            readonly property real span: drifting.width + width
+            x: (modelData.start * span + drifting.clock * modelData.speed) % span - width
+            y: modelData.y * drifting.height
         }
     }
 }

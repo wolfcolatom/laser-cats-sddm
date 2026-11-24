@@ -25,46 +25,26 @@ them by itself. See "Classic cats" below.
 ## Requirements
 
 - **SDDM 0.21 or newer with the Qt 6 greeter** (`sddm-greeter-qt6`)
-- **Qt 6 Quick modules**: Effects, Shapes, Particles (on Arch: `qt6-declarative`)
-- **Qt 6 image formats** for the animated WebP cats (Arch: `qt6-imageformats`,
-  Debian/Ubuntu: `qt6-image-formats-plugins`, Fedora: `qt6-qtimageformats`).
-  Plasma usually has it already; without it the theme runs with no cats.
-- **A GPU-accelerated X server for SDDM.** The animation is too heavy for
-  software rendering; if the login screen stays black, SDDM's X server isn't
-  accelerated (on some Intel machines the old `xf86-video-intel` driver
-  causes this; the `modesetting` driver fixes it).
-- Fonts: Space Grotesk for the clock and date is bundled; everything else
-  uses Adwaita Sans (falls back to your default sans font if missing)
-- Works at any screen size: the starfield and nebula scale up to fill
-  larger screens (1440p, 4K, ultrawide) and the cats and planets scale with
-  the screen height.
+- **Qt 6.5 or newer**: Quick with Effects, Shapes and Particles (Arch:
+  `qt6-declarative`), SVG (`qt6-svg`) and image formats for the animated
+  WebP cats (Arch: `qt6-imageformats`, Debian/Ubuntu:
+  `qt6-image-formats-plugins`, Fedora: `qt6-qtimageformats`). Plasma
+  usually has them all already.
+- **GPU acceleration for SDDM**, for the animation. Without it (Qt's
+  software renderer) the theme holds the sky still and logs in calmly (see
+  `calm`). If the screen stays black, SDDM's X server isn't accelerated (on
+  some Intel machines the old `xf86-video-intel` driver causes this; the
+  `modesetting` driver fixes it).
+- Optional: `qt6-virtualkeyboard` for the on-screen keyboard.
+
+Works at any screen size and scaling (1080p to 4K, ultrawide, HiDPI): the
+starfield and nebula scale up to fill the screen and the cats and planets
+scale with its height. On several screens the sky shows on all of them and
+the login controls on the primary one.
 
 ## Changes
 
-- 1.5: tidier code, nothing changes on screen unless you ask. Sky.qml is
-  split into one file per part (Starfield, DriftingPlanets, PlanetCat,
-  Constellation, FloatingCats, ShootingStars, Comet, Warp); every cat's
-  picture, size and paw/eye positions live in Cats.js, the colours in
-  Palette.js; clean under Qt 6's qmllint. New `calm` option (see Settings).
-  The text is ready for translation. The scripts that drew the stars,
-  nebula and planets are included (`tools/`). The cats and planets no
-  longer jump once after a day and more on screen.
-- 1.4: all-new cats made for this theme (laser-eyed kittens, paw-laser
-  tabbies on the planets, a roaring vortex cat in the warp), replacing the
-  GIFs from other artists; the planet cats' lasers follow their paws.
-  `get-cats.sh` brings back the classic GIF cats on your own computer.
-- 1.3: the clock and date in Space Grotesk (bundled), with the colon centred
-  on the digits; an amber "Caps Lock is on" warning under the password field;
-  rounded account and session lists; the session picker and power buttons on
-  a solid dark fill, the power buttons as square icons with rounded tooltips.
-- 1.2: computers with several accounts get a user picker (click the name
-  above the password field); single-account computers look the same as
-  before. Restart and Shut down are now labelled buttons in the bottom-right
-  corner.
-- 1.1: the starfield and nebula fill screens of any size (before, on
-  screens larger than 1920x1080 they left part of the screen black); the
-  drifting planets scale with the screen like the cats.
-- 1.0: first release.
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Install
 
@@ -79,6 +59,15 @@ printf '[Theme]\nCurrent=laser-cats\n' | sudo tee /etc/sddm.conf.d/laser-cats.co
 ```
 
 Update it later with `sudo git -C /usr/share/sddm/themes/laser-cats pull`.
+
+Or with `make` (also what packagers use):
+
+```
+sudo make install          # PREFIX=/usr, DESTDIR for packaging
+printf '[Theme]\nCurrent=laser-cats\n' | sudo tee /etc/sddm.conf.d/laser-cats.conf
+```
+
+There's an Arch PKGBUILD in `packaging/arch/`.
 
 Or from a release archive
 ([releases](https://github.com/wolfcolatom/laser-cats-sddm/releases)):
@@ -135,29 +124,66 @@ answer within 15 seconds, the password field comes back by itself.
 
 ## Settings (`theme.conf`)
 
+Change them in `theme.conf`, or better in `theme.conf.user` next to it
+(SDDM reads both, and an update won't overwrite your own file):
+
+```
+[General]
+calm=true
+```
+
+- `calm`: a gentler screen, for anyone sensitive to motion or on battery:
+  no explosion or warp when you log in (it logs straight in, with no
+  2-second wait), no flashing as you type, no shooting stars or comet.
+  `auto` (the default) is calm only without GPU acceleration; `true` always;
+  `false` never.
+- `timeFormat`, `dateFormat`: the clock and date, in
+  [Qt's format](https://doc.qt.io/qt-6/qml-qtqml-date.html#format-strings)
+  (for example `HH:mm` and `dddd d MMMM`). Empty (the default) follows your
+  language and 12/24-hour setting.
+- `keyboard`: `true` adds an on-screen keyboard button, for touch screens.
+  It needs `qt6-virtualkeyboard` and `InputMethod=qtvirtualkeyboard` in
+  SDDM's own settings (`/etc/sddm.conf.d/`).
 - `accent`: the colour the password field's edge starts with.
-- `calm`: `true` for a gentler screen, for anyone sensitive to motion or on
-  battery: no explosion or warp when you log in (it logs straight in, with
-  no 2-second wait), no flashing as you type, no shooting stars or comet.
+- `classic`: set by `get-cats.sh` (see Classic cats).
+
+## Accessibility
+
+- Every control has a name and role for screen readers.
+- Everything works from the keyboard: Tab moves between the password, the
+  account and session lists and the power buttons (with a visible ring),
+  Enter or Space presses them, Escape clears the password.
+- Text meets WCAG AA contrast (checked by the tests).
+- Messages from SDDM (an account locked, a password about to expire) and
+  the Caps Lock warning are announced as alerts.
+- `calm` for anyone sensitive to motion; right-to-left languages mirror
+  the layout.
 
 ## Files
 
-- `Main.qml`: the login screen (clock, password, pickers, power buttons).
-- `Sky.qml`: the animated sky; it holds the shared state (flash, wrong
-  password, explosion, warp) and puts the parts together:
-  `Starfield.qml`, `DriftingPlanets.qml`, `PlanetCat.qml`,
-  `Constellation.qml`, `FloatingCats.qml`, `ShootingStars.qml`,
-  `Comet.qml`, `Warp.qml`.
-- `Cats.js`: every cat's picture, size, lane, and paw/eye positions (so
-  the lasers line up). Swapping a cat is an edit here.
-- `Palette.js`: the colours.
-- `tools/`: the scripts that drew the stars, nebula and planets.
-- `get-cats.sh`, `get-cats/`: the optional classic cats.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how it fits together.
+In short: `Main.qml` is the login screen, `Sky.qml` the animated sky and its
+parts are one file each; `Cats.js` holds every cat's picture and paw/eye
+positions, `Palette.js` the colours, `Rng.js` the seeded random numbers.
+`tools/` draws the stars, nebula and planets; `get-cats.sh` makes the
+optional classic cats; `tests/` and `ci/` hold the checks.
 
 ## Translations
 
-All the text (Password, Wrong password, Caps Lock is on, Restart, Shut
-down) is marked with `qsTr()`, ready for translations.
+German, Spanish, French, Italian, Japanese, Dutch, Polish, Brazilian
+Portuguese, Russian and Simplified Chinese; the clock and date follow your
+language too. To add one, see [translations/README.md](translations/README.md).
+
+## Development
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the details. `make check` runs what
+CI runs on every change: Qt's linter with no warnings allowed, the test
+suites (the login flow, the cat data, contrast, the random numbers),
+headless runs (normal, calm, no GPU, HiDPI, right-to-left), screenshot
+comparisons of the sky, and every translation. Performance figures are in
+[docs/PERFORMANCE.md](docs/PERFORMANCE.md), where the art comes from in
+[docs/ART.md](docs/ART.md), and how the password is handled in
+[SECURITY.md](SECURITY.md).
 
 ## Credits and licence
 
