@@ -162,9 +162,10 @@ calm=true
 ## Files
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how it fits together.
-In short: `Main.qml` is the login screen, `Sky.qml` the animated sky and its
-parts are one file each; `Cats.js` holds every cat's picture and paw/eye
-positions, `Palette.js` the colours, `Rng.js` the seeded random numbers.
+In short: `login/` is the login screen (and the one file that talks to
+SDDM), `sky/` the animated sky, one file per part, with every cat's picture
+and paw/eye positions in `sky/CatSets.qml`; `style/Theme.qml` holds the
+colours. `Main.qml` only joins them.
 `tools/` draws the stars, nebula and planets; `get-cats.sh` makes the
 optional classic cats; `tests/` and `ci/` hold the checks.
 

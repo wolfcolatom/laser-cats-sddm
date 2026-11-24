@@ -5,7 +5,7 @@
 dark green, brown and a little deep red, mostly empty black between. Two
 1920x1080 layers that tile side to side (they drift behind the stars).
 And a jade nebula in the theme's own jade.
-Usage: make-haze.py OUTDIR  -> OUTDIR/haze-{far,near,jade}.png"""
+Usage: make-haze.py OUTDIR  -> OUTDIR/haze-{near,jade}.png"""
 import subprocess, sys
 import numpy as np
 
@@ -46,7 +46,6 @@ def layer(name, seed, colours, coverage, strength):
 
 
 GREEN, MOSS, BROWN, RUST, DEEPRED = (40, 72, 34), (52, 66, 30), (70, 44, 24), (92, 40, 22), (110, 22, 18)
-layer("far", 11, [GREEN, MOSS, BROWN, GREEN], coverage=0.22, strength=0.55)
 # the warm wisps in the theme amber (they were the GIF's rust red)
 AMBER_D, AMBER_M, AMBER, AMBER_B = (70, 44, 6), (110, 70, 4), (168, 107, 0), (190, 128, 30)
 layer("near", 23, [AMBER_D, AMBER_M, AMBER, AMBER_M], coverage=0.12, strength=0.24)

@@ -46,7 +46,7 @@ def layer(name, n, widths, heights, palette, glows=0, dust=0, red=0, gold=0):
                     f"PNG32:{out}/stars-{name}.png"], input=img.tobytes(), check=True)
 
 # Measured from the GIF: ~80% of its bright stars stay still (a backdrop);
-# the rest drift right in three speeds (Sky.qml: 16 / 37 / 68 px a second).
+# the rest drift right in three speeds (sky/Starfield.qml: 16 / 37 / 68 px a second).
 # Bright-pixel density overall ~2.3% (>60 of 255), ~1.6% (>120), ~0.5% (>180).
 DIM = ["#5a6e6a", "#667a74", "#5e7270", "#6e8480", "#3f7a6e"]          # lum 90-140: grey-teal, a little jade
 MIDC = ["#9aaea8", "#a8bcb6", "#b4c4be", "#7fb8ac", "#5fa898"]        # lum 150-205: misty mint, jade

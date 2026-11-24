@@ -4,6 +4,48 @@ All notable changes to Laser Cats. Versions follow
 [semantic versioning](https://semver.org); the format follows
 [Keep a Changelog](https://keepachangelog.com).
 
+## [1.7] - 2026-11-24
+
+Nothing looks different; this release is about how the theme is built.
+
+### Changed
+- The code is in three folders with one-way dependencies: `login/` (the
+  screen), `sky/` (the animation) and `style/` (the colours). `Main.qml`
+  only joins them.
+- Only `login/SddmBackend.qml` talks to SDDM. The login screen is written
+  against a small `Backend` interface, so the whole login runs in the tests
+  against a fake one.
+- The login itself is a small state machine (`LoginController`), separate
+  from anything drawn, and theme.conf is read and checked in one place
+  (`Settings`).
+- The warp tells the login when it has ended, instead of the login
+  guessing with a timer.
+- Every cat is typed data (`sky/CatSets.qml`) instead of an untyped
+  JavaScript object, and each part of the sky owns its own seeded random
+  numbers.
+- The colours are one singleton, `style/Theme.qml`.
+- `get-cats.sh` checks its downloads against full SHA-256 sums, refuses
+  unknown options, and stops rather than build from a changed download
+  (`--force` overrides).
+
+### Fixed
+- The on-screen keyboard filled the whole screen, slid in at start-up, and
+  once up covered its own button and could cover the password field. It
+  now slides up only when asked, and the controls move clear of it.
+- The oldest supported Qt is 6.8, not 6.5 as the notes said.
+
+### Added
+- Tests for the controller, the settings and the on-screen keyboard, and
+  reference pictures of the login screen itself (plain, with warnings,
+  with several users).
+- `make greeter`: the theme loaded by the real SDDM greeter, also in CI.
+- CI runs on a pinned Qt, again on Qt 6.8, and weekly on the newest; the
+  release is built from the same pinned packages.
+- `make update-translations`.
+
+### Removed
+- An unused nebula layer and its picture.
+
 ## [1.6] - 2026-11-24
 
 ### Added
@@ -97,5 +139,6 @@ All notable changes to Laser Cats. Versions follow
 
 First release.
 
+[1.7]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7
 [1.6]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.6
 [1.5]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.5

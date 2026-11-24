@@ -8,7 +8,7 @@ taken from the middle value of each pixel across the frames, which drops
 the beams that cross it, then cut out along its black sticker outline. The
 city is left out; the bottom of the cat fades, behind the planet anyway.
 Holes inside the cat (its ears) are then filled so no stars show through.
-Its laser beams are drawn by Sky.qml.
+Its laser beams are drawn by sky/Beam.qml.
 Usage: make-planet-cat.py SOURCE.gif OUT.png"""
 import subprocess, sys
 from collections import deque

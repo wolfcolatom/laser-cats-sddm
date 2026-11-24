@@ -6,7 +6,7 @@ you give it. They need python3 with numpy and ImageMagick 7 (`magick`).
 | Script | Makes |
 |---|---|
 | `make-stars.py OUTDIR` | `stars-still.png`, `stars-far.png`, `stars-mid.png`, `stars-near.png` |
-| `make-haze.py OUTDIR` | `haze-jade.png`, `haze-near.png` (and `haze-far.png`, the unused olive variant) |
+| `make-haze.py OUTDIR` | `haze-jade.png`, `haze-near.png` |
 | `make-planets.py OUTDIR [--crater]` | `planet-jade.png`, `planet-earth.png`, `planet-amber.png`, `planet-moon.png`, `rock-1..4.png`, `glow.png`, `smoke.png` |
 
 The stars, nebula, amber planet, moon, rocks, glow and smoke come out
