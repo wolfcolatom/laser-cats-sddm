@@ -13,8 +13,8 @@ Backend {
     users: userModel
     sessions: sessionModel
     lastUser: userModel.lastUser
-    lastUserIndex: userModel.lastIndex
-    lastSession: sessionModel.lastIndex
+    lastUserIndex: userModel.lastIndex ?? 0
+    lastSession: sessionModel.lastIndex ?? 0
     canReboot: sddm.canReboot
     canPowerOff: sddm.canPowerOff
     capsLock: keyboard.capsLock

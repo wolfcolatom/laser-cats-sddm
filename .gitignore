@@ -10,3 +10,4 @@ theme.conf.user
 build/
 laser-cats-sddm-*.tar.gz
 smoke.log
+greeter.log

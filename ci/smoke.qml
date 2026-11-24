@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 tom
 // SPDX-License-Identifier: GPL-3.0-or-later
-// CI smoke test: loads the theme with a stand-in for what SDDM provides,
+// CI smoke test: loads the theme the way SDDM does (Main.qml, with stand-ins
+// for the context objects SDDM provides, so SddmBackend.qml is exercised),
 // types a password, presses Enter and waits for the login to go through.
 // Exits 0 if the theme loaded and SDDM was asked to log in, 1 otherwise.
 // QML errors are caught by the workflow from the log.
-//   QT_QPA_PLATFORM=offscreen qml ci/smoke.qml [-- calm]
+//   QT_QPA_PLATFORM=offscreen qml ci/smoke.qml [-- calm | keyboard]
 import QtQuick
 import QtQuick.Window
 import QtTest
@@ -16,9 +17,11 @@ Window {
     color: "black"
 
     readonly property bool calmMode: Qt.application.arguments.indexOf("calm") >= 0
+    readonly property bool keyboardMode: Qt.application.arguments.indexOf("keyboard") >= 0
 
     // what SDDM gives a theme
-    QtObject { id: config; property string accent: "#43af9c"; property string calm: win.calmMode ? "true" : "false" }
+    QtObject { id: config; property string accent: "#43af9c"; property string calm: win.calmMode ? "true" : "false"
+                           property string keyboard: win.keyboardMode ? "true" : "false" }
     QtObject { id: keyboard; property bool capsLock: false }
     QtObject {
         id: userModel

@@ -68,6 +68,7 @@ lint:
 
 test:
 	$(QML_ENV) $(QTBIN)/qmltestrunner -input tests
+	$(if $(HAVE_VK),QT_IM_MODULE=qtvirtualkeyboard $(QML_ENV) $(QTBIN)/qmltestrunner -input ci/tst_keyboard.qml,@echo "(qt6-virtualkeyboard not installed: on-screen keyboard test not run)")
 
 # headless runs; any QML warning fails them
 smoke:
@@ -81,7 +82,19 @@ smoke:
 	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' smoke.log
 	@echo "== right-to-left"; LANG=he_IL.UTF-8 LC_ALL=he_IL.UTF-8 $(QML_ENV) timeout 60 $(QTBIN)/qml ci/i18n.qml > smoke.log 2>&1; cat smoke.log; \
 	  grep -q 'mirrored=true' smoke.log
+	$(if $(HAVE_VK),@echo "== on-screen keyboard"; QT_IM_MODULE=qtvirtualkeyboard $(QML_ENV) timeout 60 $(QTBIN)/qml ci/smoke.qml -- keyboard > smoke.log 2>&1; s=$$?; cat smoke.log; \
+	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' smoke.log,@echo "(qt6-virtualkeyboard not installed: on-screen keyboard not run)")
 	@rm -f smoke.log
+
+# the real SDDM greeter, headless, for a few seconds: it must load Main.qml
+# and stay up (so it ends by the timeout, exit 124) with no QML warnings.
+# Not part of `check`: it needs SDDM installed.
+greeter:
+	@$(QML_ENV) timeout 8 sddm-greeter-qt6 --test-mode --theme "$(CURDIR)" > greeter.log 2>&1; s=$$?; \
+	  grep -q 'Loading file.*Main.qml' greeter.log || { cat greeter.log; echo "greeter: the theme was not loaded"; exit 1; }; \
+	  ! grep -E '\.qml:[0-9]+' greeter.log || { echo "greeter: QML warnings above"; exit 1; }; \
+	  [ $$s = 124 ] || { tail -5 greeter.log; echo "greeter: exited early ($$s)"; exit 1; }
+	@rm -f greeter.log; echo "greeter: loaded under the real SDDM greeter, no warnings"
 
 visual:
 	ci/compare.sh
@@ -104,4 +117,4 @@ dist: translations
 	@echo "built $(NAME)-sddm-$(VERSION).tar.gz"
 
 clean:
-	rm -rf build smoke.log $(NAME)-sddm-*.tar.gz
+	rm -rf build smoke.log greeter.log $(NAME)-sddm-*.tar.gz
