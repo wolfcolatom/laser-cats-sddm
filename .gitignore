@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.bak
+# classic cats made by get-cats.sh (not ours to share)
+assets/cat-a-jade.webp
+assets/cat-b-mint.webp
+assets/planet-cat.png
+assets/spiral-cat.webp
