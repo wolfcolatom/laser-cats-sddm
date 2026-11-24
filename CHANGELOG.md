@@ -11,7 +11,8 @@ All notable changes to Laser Cats. Versions follow
   Plasma Login Manager, which takes Plasma wallpapers instead of SDDM
   themes, and for the Plasma desktop and lock screen. It is the same sky
   as the login theme, without the explosion and warp (a wallpaper doesn't
-  know when a password goes in), with a Calm setting.
+  know when a password goes in), with a Calm setting. On the desktop it
+  holds still while a maximised or fullscreen window covers it.
   `make install-wallpaper`, or the `laser-cats-wallpaper` archive from the
   release with `kpackagetool6`. The Arch package installs it too.
 

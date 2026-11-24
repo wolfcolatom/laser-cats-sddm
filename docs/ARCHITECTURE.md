@@ -105,6 +105,7 @@ the primary screen; only that one shows the login controls.
 | `ci/smoke.qml` | the real `Main.qml`, headless: normal, calm, HiDPI, right-to-left, on-screen keyboard |
 | `make smoke-gl` | the same run drawn with OpenGL on a virtual display, as on a real login screen |
 | `make greeter` | the theme loaded by the real `sddm-greeter-qt6` |
+| `make test-wallpaper-gl` | the wallpaper drawn with OpenGL: it moves, draws no frames while the desktop is covered, and moves again after |
 | `make test-wallpaper` | the wallpaper package loaded the way Plasma Login Manager loads one, with a stand-in for Plasma's `WallpaperItem` and, where libplasma is installed (CI), the real one, then installed with `kpackagetool6` |
 
 The headless checks draw with Qt's software renderer, which leaves out the

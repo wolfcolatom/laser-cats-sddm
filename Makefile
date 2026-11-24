@@ -35,7 +35,7 @@ WALLID    := org.wolfcolatom.lasercats
 WALLBUILD := build/wallpaper/$(WALLID)
 WALLDIR   := $(DESTDIR)$(PREFIX)/share/plasma/wallpapers/$(WALLID)
 
-.PHONY: wallpaper install-wallpaper uninstall-wallpaper dist-wallpaper test-wallpaper
+.PHONY: wallpaper install-wallpaper uninstall-wallpaper dist-wallpaper test-wallpaper test-wallpaper-gl
 .PHONY: all install uninstall translations update-translations check versions lint test smoke smoke-gl greeter visual i18n dist clean
 
 all: translations
@@ -119,6 +119,15 @@ smoke-gl:
 	@rm -f smoke.log
 	@echo "smoke-gl: drawn with OpenGL, no warnings"
 
+# The wallpaper drawn with OpenGL (Mesa's software GL on a virtual display),
+# so the animated path runs: it must move, draw nothing while the desktop is
+# covered, and move again after. Not part of `check`: it needs xvfb-run.
+test-wallpaper-gl: wallpaper
+	@LIBGL_ALWAYS_SOFTWARE=1 QT_QPA_PLATFORM=xcb QT_FORCE_STDERR_LOGGING=1 xvfb-run -a -s "-screen 0 1280x720x24" \
+	  timeout 120 $(QTBIN)/qml -I ci/stubs ci/wallpaper.qml -- $(abspath $(WALLBUILD)) > wallpaper.log 2>&1; s=$$?; cat wallpaper.log; \
+	  [ $$s = 0 ] && grep -q 'paused when covered' wallpaper.log && ! grep -E '\.qml:[0-9]+' wallpaper.log
+	@rm -f wallpaper.log
+
 # the real SDDM greeter, headless, for a few seconds: it must load Main.qml
 # and stay up (so it ends by the timeout, exit 124) with no QML warnings.
 # Not part of `check`: it needs SDDM installed.
@@ -179,13 +188,16 @@ dist-wallpaper: wallpaper
 # it with KDE's own package tool, where libplasma is installed (as in CI).
 # Any QML warning fails it.
 HAVE_PLASMA := $(wildcard $(QMLDIR)/org/kde/plasma/plasmoid)
+HAVE_KIRIGAMI := $(wildcard $(QMLDIR)/org/kde/kirigami)
+HAVE_IMAGEWP := $(wildcard $(QMLDIR)/org/kde/plasma/wallpapers/image)
 KPKGTEST  := build/kpackage-test
 test-wallpaper: wallpaper
 	@for mode in normal calm; do \
 	  $(QML_ENV) timeout 60 $(QTBIN)/qml -I ci/stubs ci/wallpaper.qml -- $(abspath $(WALLBUILD)) $$mode > wallpaper.log 2>&1; s=$$?; cat wallpaper.log; \
 	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' wallpaper.log || exit 1; done
-	@$(QTBIN)/qmllint --max-warnings 0 -I $(abspath ci/stubs) $(abspath $(WALLBUILD)/contents/ui/main.qml) > /dev/null 2>&1 \
-	  && echo "wallpaper lint: no warnings" || { $(QTBIN)/qmllint -I $(abspath ci/stubs) $(abspath $(WALLBUILD)/contents/ui/main.qml); exit 1; }
+	@files="$(abspath $(WALLBUILD)/contents/ui/main.qml)$(if $(HAVE_KIRIGAMI), $(abspath $(WALLBUILD)/contents/ui/config.qml))$(if $(HAVE_IMAGEWP), $(abspath $(WALLBUILD)/contents/ui/CoverMonitor.qml))"; \
+	  $(QTBIN)/qmllint --max-warnings 0 -I $(abspath ci/stubs) $$files > /dev/null 2>&1 \
+	  && echo "wallpaper lint: $$(echo $$files | wc -w) files, no warnings" || { $(QTBIN)/qmllint -I $(abspath ci/stubs) $$files; exit 1; }
 	$(if $(HAVE_PLASMA),@$(QML_ENV) timeout 60 $(QTBIN)/qml ci/wallpaper.qml -- $(abspath $(WALLBUILD)) plasma > wallpaper.log 2>&1; s=$$?; cat wallpaper.log; \
 	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' wallpaper.log,@echo "(libplasma not installed: not tried with the real Plasma)")
 	$(if $(HAVE_PLASMA),@rm -rf $(KPKGTEST) && mkdir -p $(KPKGTEST) \

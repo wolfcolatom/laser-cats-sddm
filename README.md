@@ -129,7 +129,10 @@ settings. For Plasma Login Manager it can also be set by hand in
 WallpaperPluginId=org.wolfcolatom.lasercats
 ```
 
-Its one setting, **Calm** (no shooting stars or comet), is in the wallpaper
+On the desktop the sky holds still while a maximised or fullscreen window
+covers it (as KDE's own animated wallpapers do), so it costs nothing while
+you work. Its settings: **Calm** (no shooting stars or comet) and **Keep
+animating behind maximized and fullscreen windows**, in the wallpaper
 settings, or for Plasma Login Manager in `/etc/plasmalogin.conf`:
 
 ```

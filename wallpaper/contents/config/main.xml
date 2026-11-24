@@ -11,5 +11,9 @@
       <label>No shooting stars or comet</label>
       <default>false</default>
     </entry>
+    <entry name="AlwaysAnimate" type="Bool">
+      <label>Keep animating behind maximized and fullscreen windows</label>
+      <default>false</default>
+    </entry>
   </group>
 </kcfg>

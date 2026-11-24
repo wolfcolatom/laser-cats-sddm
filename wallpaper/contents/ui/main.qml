@@ -18,11 +18,22 @@ WallpaperItem {
     // keys come from main.xml at run time, which the linter can't see.
     // qmllint disable missing-property
     readonly property bool calm: configuration ? configuration.Calm === true : false
+    readonly property bool alwaysAnimate: configuration ? configuration.AlwaysAnimate === true : false
     // qmllint enable missing-property
 
     // Without GPU acceleration (Qt's software renderer) the animation can't
     // run smoothly: hold the sky still, as the login theme does.
     readonly property bool softwareRendering: GraphicsInfo.api === GraphicsInfo.Software
+
+    // A maximised or fullscreen window covers the desktop: hold the sky
+    // still, so nobody pays for an animation they can't see (unless
+    // AlwaysAnimate). Held still, nothing in the sky draws a frame.
+    property bool covered: coverMonitor.item ? (coverMonitor.item as CoverMonitor).covered : false
+    readonly property bool paused: covered && !alwaysAnimate
+    Loader {
+        id: coverMonitor
+        source: "CoverMonitor.qml"
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -32,6 +43,6 @@ WallpaperItem {
         objectName: "sky"
         anchors.fill: parent
         calm: wallpaper.calm
-        frozen: wallpaper.softwareRendering
+        frozen: wallpaper.softwareRendering || wallpaper.paused
     }
 }

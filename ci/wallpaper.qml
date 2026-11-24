@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Loads the built Plasma wallpaper package the way Plasma Login Manager does
 // (its main script, created with `configuration` and `pluginName`), lets it
-// run, and checks the sky is there and moving. Saves a picture if OUTDIR is
+// run, and checks the sky is there and moving. Drawn with a GPU API, it
+// also checks that a covered desktop (a maximised window) draws no frames
+// and that the sky moves again once uncovered. Saves a picture if OUTDIR is
 // given. Exits 0 if all is well.
 //   qml -I ci/stubs ci/wallpaper.qml -- PACKAGE_DIR [calm] [OUTDIR]
 //   qml ci/wallpaper.qml -- PACKAGE_DIR plasma
@@ -24,11 +26,14 @@ Window {
     readonly property bool plasma: args.indexOf("plasma") >= 0
     readonly property string outDir: args.length > 1 && ["calm", "plasma"].indexOf(args[args.length - 1]) < 0 ? args[args.length - 1] : ""
 
-    property Item wallpaper: null
-    // the wallpaper's sky: the package carries its own copy of sky/, a type
-    // QML can't name from here, so it is held untyped
+    // the wallpaper and its sky: types from the package (WallpaperItem, its own
+    // copy of sky/) that QML can't name from here, so both are held untyped
+    property var wallpaper: null
     property var sky: null
     property real clockAtStart: -1
+    property int frames: 0
+    property bool counting: false
+    onFrameSwapped: if (counting) frames++
 
     function find(item: Item, name: string): Item {
         if (item.objectName === name) return item
@@ -59,6 +64,31 @@ Window {
             check.start()
         }
     }
+    function finish(note: string) {
+        const done = () => { console.log("wallpaper: ok" + (win.calm ? " (calm)" : "") + note); Qt.exit(0) }
+        if (win.outDir === "") { done(); return }
+        win.wallpaper.grabToImage(r => { r.saveToFile(win.outDir + "/wallpaper" + (win.calm ? "-calm" : "") + ".png"); done() })
+    }
+    Timer { id: settle; interval: 800; onTriggered: { win.frames = 0; win.counting = true; count.start() } }
+    Timer {
+        id: count
+        interval: 1500
+        onTriggered: {
+            win.counting = false
+            if (win.frames > 2) { win.fail("covered, but it drew " + win.frames + " frames in 1.5 s"); return }
+            win.clockAtStart = win.sky.clock
+            win.wallpaper.covered = false
+            resumed.start()
+        }
+    }
+    Timer {
+        id: resumed
+        interval: 1000
+        onTriggered: {
+            if (!(win.sky.clock > win.clockAtStart)) { win.fail("uncovered, but the sky didn't move again"); return }
+            win.finish(" (paused when covered: " + win.frames + " frames in 1.5 s; moving again after)")
+        }
+    }
     Timer {
         id: check
         interval: 1500
@@ -68,9 +98,10 @@ Window {
             // held still without a GPU; otherwise its clock must have moved on
             if (!software && !(sky.clock > win.clockAtStart)) { win.fail("the sky isn't moving"); return }
             if (software && !sky.frozen) { win.fail("software rendering, but the sky isn't held still"); return }
-            const done = () => { console.log("wallpaper: ok" + (win.calm ? " (calm)" : "") + (software ? " (held still: software renderer)" : "")); Qt.exit(0) }
-            if (win.outDir === "") { done(); return }
-            win.wallpaper.grabToImage(r => { r.saveToFile(win.outDir + "/wallpaper" + (win.calm ? "-calm" : "") + ".png"); done() })
+            if (software) { win.finish(" (held still: software renderer)"); return }
+            // covered: after a moment to settle, it must draw (next to) nothing
+            win.wallpaper.covered = true
+            settle.start()
         }
     }
 }
