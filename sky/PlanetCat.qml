@@ -11,7 +11,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: planetCat
@@ -21,6 +20,8 @@ Item {
     required property real boom         // 0 -> 1 when the right password goes in: the planet
                                         // blows apart and the cat is blasted away
     required property var cat           // its picture, paws and beams (Cats.js)
+    required property int seed          // for its random numbers
+    Rng { id: chance; seed: planetCat.seed }
     property url planet: "../assets/planet-jade.png"   // or planet-earth.png
     property real homeX: 0              // where it floats around
     property real homeY: 0
@@ -89,6 +90,7 @@ Item {
         source: planetCat.planet
         centre: planetCat.centre
         e: planetCat.e
+        rng: chance
     }
     Explosion {
         centre: planetCat.centre
@@ -115,13 +117,14 @@ Item {
             spreadBase: planetCat.cat.beamSpread.base
             spreadGrowth: planetCat.cat.beamSpread.growth
             active: planetCat.active
+            rng: chance
             fade: planetCat.e
         }
     }
     Repeater {
         id: impacts
         model: 8
-        Impact {}
+        Impact { rng: chance }
     }
     PlanetFire {
         id: fire
@@ -143,16 +146,16 @@ Item {
     // and sometimes (`bite`: always) a piece chipped off
     property int nextImpact: 0
     function hitBeam(colour, bite) {
-        const b = lasers.itemAt(Math.floor(Rng.next() * lasers.count)) as Beam
+        const b = lasers.itemAt(Math.floor(chance.next() * lasers.count)) as Beam
         if (!b) return
         const outward = Math.atan2(b.to.y - centre.y, b.to.x - centre.x)
         const flash = impacts.itemAt(nextImpact) as Impact
         flash.go(b.to.x, b.to.y, colour, outward)
         nextImpact = (nextImpact + 1) % impacts.count
         fire.impact(b.to.x, b.to.y, outward)
-        if (bite || Rng.next() < biteChance) {
+        if (bite || chance.next() < biteChance) {
             chipped.addBite(b.to.x, b.to.y, outward)
-            fire.chips(bite ? 4 : 2 + Math.floor(Rng.next() * 2), b.to.x, b.to.y)
+            fire.chips(bite ? 4 : 2 + Math.floor(chance.next() * 2), b.to.x, b.to.y)
         }
     }
     // typing the password: every 2nd key (Sky.keyPressed) chips a piece off
@@ -163,8 +166,8 @@ Item {
     Timer {
         interval: 160; repeat: true; running: planetCat.active && planetCat.boom <= 0
         onTriggered: {
-            interval = planetCat.fireballMinMs + Rng.next() * planetCat.fireballSpreadMs
-            planetCat.hitBeam(Rng.next() < planetCat.amberChance ? Theme.amber : Theme.mint, false)
+            interval = planetCat.fireballMinMs + chance.next() * planetCat.fireballSpreadMs
+            planetCat.hitBeam(chance.next() < planetCat.amberChance ? Theme.amber : Theme.mint, false)
         }
     }
 }

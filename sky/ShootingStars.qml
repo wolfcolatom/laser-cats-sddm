@@ -4,13 +4,14 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: shootingStars
     anchors.fill: parent
     required property bool running      // shown
     required property bool active       // shooting now and then (off while held still)
+    required property int seed          // for its random numbers
+    Rng { id: rng; seed: shootingStars.seed }
 
     // shooting stars: three, each on its own timer (every 2-7 s), with
     // their own length, angle and speed; a mint trail to a white head
@@ -48,13 +49,13 @@ Item {
             Timer {
                 interval: 1500 + shooting.index * 1700; repeat: true; running: shootingStars.active
                 onTriggered: {
-                    interval = 2000 + Rng.next() * 5000
-                    shooting.width = 110 + Rng.next() * 170
-                    shooting.rotation = 8 + Rng.next() * 28
-                    shooting.dist = 350 + Rng.next() * 450
-                    shooting.time = 600 + Rng.next() * 700
-                    shooting.x0 = Rng.next() * shootingStars.width * 0.85
-                    shooting.y0 = Rng.next() * shootingStars.height * 0.7
+                    interval = 2000 + rng.next() * 5000
+                    shooting.width = 110 + rng.next() * 170
+                    shooting.rotation = 8 + rng.next() * 28
+                    shooting.dist = 350 + rng.next() * 450
+                    shooting.time = 600 + rng.next() * 700
+                    shooting.x0 = rng.next() * shootingStars.width * 0.85
+                    shooting.y0 = rng.next() * shootingStars.height * 0.7
                     shoot.start()
                 }
             }

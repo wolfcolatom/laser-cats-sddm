@@ -7,10 +7,10 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: impact
+    required property Rng rng
     width: 0; height: 0
     visible: p < 1
     property real p: 1                      // 0 -> 1 over the burst
@@ -23,10 +23,10 @@ Item {
     // at (px, py), in `c`, flying off the surface in direction `out` (radians)
     function go(px, py, c, out) {
         x = px; y = py; colour = c; outward = out
-        let n = 8 + Math.floor(Rng.next() * 3), ds = [], rs = []
+        let n = 8 + Math.floor(rng.next() * 3), ds = [], rs = []
         for (let k = 0; k < n; k++) {
-            ds.push(out + (Rng.next() - 0.5) * 2.4)      // a fan of about +/-70 degrees
-            rs.push(12 + Rng.next() * 20)
+            ds.push(out + (rng.next() - 0.5) * 2.4)      // a fan of about +/-70 degrees
+            rs.push(12 + rng.next() * 20)
         }
         dirs = ds; reach = rs
         pop.restart()

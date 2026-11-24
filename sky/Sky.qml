@@ -7,7 +7,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "Cats.js" as Cats
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: root
@@ -24,10 +23,10 @@ Item {
     property bool frozen: false
     readonly property bool live: running && !frozen
     FrameAnimation { running: root.live; onTriggered: root.clock += frameTime }
-    // the random seed: a new one each time, or fixed for repeatable tests
+    // the random seed: a new one each time, or fixed for repeatable tests.
+    // Each part that needs chance gets its own generator, seeded from this.
     property int seed: Math.floor(Math.random() * 2147483647)
     Component.onCompleted: {
-        Rng.seed(seed)
         // switch the flash effect on, invisibly faint, for a moment at the
         // start, so Qt prepares it before the first key press rather than
         // stuttering on it
@@ -98,6 +97,7 @@ Item {
         id: planetLeft
         z: 5
         running: root.running; active: root.live; clock: root.clock
+        seed: root.seed + 1
         boom: root.blast
         cat: root.cats.planetCat
         // flashes on key presses / goes amber on a wrong password, like the floating cats
@@ -110,6 +110,7 @@ Item {
         id: planetRight
         z: 5
         running: root.running; active: root.live; clock: root.clock
+        seed: root.seed + 2
         boom: root.blast
         cat: root.cats.planetCat
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
@@ -131,15 +132,17 @@ Item {
         flash: root.flash; alarm: root.alarm; blast: root.blast
         cats: root.cats.floaters
     }
-    ShootingStars { running: root.running && !root.calm; active: root.live && !root.calm }
+    ShootingStars { running: root.running && !root.calm; active: root.live && !root.calm; seed: root.seed + 3 }
     Comet {
         id: comet
         running: root.running && !root.calm; active: root.live && !root.calm
+        seed: root.seed + 4
         areaWidth: root.width; areaHeight: root.height
     }
     Warp {
         warp: root.warp; blast: root.blast; catScale: root.catScale
         playing: !root.frozen
+        seed: root.seed + 5
         cat: root.cats.warpCat
     }
 }

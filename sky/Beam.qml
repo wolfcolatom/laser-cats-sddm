@@ -8,7 +8,6 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Shapes
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: beam
@@ -24,6 +23,7 @@ Item {
     required property real spreadBase   // half-width at the planet: base + length x growth
     required property real spreadGrowth
     required property bool active       // shimmering (off while held still)
+    required property Rng rng
     property real fade: 0               // 0-1: gone as the planet blows up
 
     readonly property real ang: (angle + sweep * Math.sin(clock * 2 * Math.PI * speed / 6 + phase)) * Math.PI / 180
@@ -33,7 +33,7 @@ Item {
     readonly property real spread: spreadBase + len * spreadGrowth
 
     property real shimmer: 1
-    Timer { interval: 70; repeat: true; running: beam.active; onTriggered: beam.shimmer = 0.8 + Rng.next() * 0.2 }
+    Timer { interval: 70; repeat: true; running: beam.active; onTriggered: beam.shimmer = 0.8 + beam.rng.next() * 0.2 }
 
     // laid along x from the paw; the item is as tall as the widest end, so
     // the soft-edge blur has room

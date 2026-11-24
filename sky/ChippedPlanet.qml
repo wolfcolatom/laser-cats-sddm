@@ -7,13 +7,13 @@
 // freezing.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "Rng.js" as Rng
 
 Canvas {
     id: planet
     required property url source        // planet-*.png
     required property point centre      // where its middle goes (in the parent)
     required property real e            // 0-1: the explosion (it fades and swells)
+    required property Rng rng
     readonly property int maxBites: 90
 
     width: 357; height: 357             // the planet pictures' size
@@ -33,13 +33,13 @@ Canvas {
                 if (!bites[o].healing) { bites[o].healing = true; bites[o].r0 = bites[o].r; break }
             healTimer.start()
         }
-        const depth = 2 + Rng.next() * 8 + Math.min(1, bites.length / maxBites) * 12
+        const depth = 2 + rng.next() * 8 + Math.min(1, bites.length / maxBites) * 12
         const k = []
-        const n = 7 + Math.floor(Rng.next() * 3)
-        for (let i = 0; i < n; i++) k.push(0.7 + Rng.next() * 0.5)
+        const n = 7 + Math.floor(rng.next() * 3)
+        for (let i = 0; i < n; i++) k.push(0.7 + rng.next() * 0.5)
         const list = bites.slice()
         list.push({ x: px - Math.cos(outward) * depth - x, y: py - Math.sin(outward) * depth - y,
-                    r: 6 + Rng.next() * 7, k: k, rot: Rng.next() * 6.28 })
+                    r: 6 + rng.next() * 7, k: k, rot: rng.next() * 6.28 })
         bites = list
         requestPaint()
     }

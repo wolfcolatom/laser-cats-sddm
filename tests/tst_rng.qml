@@ -1,27 +1,38 @@
 // SPDX-FileCopyrightText: 2026 tom
 // SPDX-License-Identifier: GPL-3.0-or-later
-// The seeded random numbers (Rng.js) the sky uses.
+// The seeded random numbers (sky/Rng.qml) the sky uses.
 import QtQuick
 import QtTest
-import "../sky/Rng.js" as Rng
+import "../sky"
 
 TestCase {
     name: "Rng"
 
-    function draw(seed, n) {
-        Rng.seed(seed)
+    Rng { id: a }
+    Rng { id: b }
+
+    function draw(rng, seed, n) {
+        rng.seed = seed
+        rng.reseed()
         const out = []
-        for (let i = 0; i < n; i++) out.push(Rng.next())
+        for (let i = 0; i < n; i++) out.push(rng.next())
         return out
     }
-    function test_sameSeedSameNumbers() { compare(draw(42, 50), draw(42, 50)) }
-    function test_differentSeedsDiffer() { verify(draw(1, 10).join() !== draw(2, 10).join()) }
+    function test_sameSeedSameNumbers() { compare(draw(a, 42, 50), draw(b, 42, 50)) }
+    function test_differentSeedsDiffer() { verify(draw(a, 1, 10).join() !== draw(b, 2, 10).join()) }
+    function test_generatorsAreIndependent() {
+        const alone = draw(a, 7, 20)
+        a.seed = 7; a.reseed(); b.seed = 99; b.reseed()
+        const mixed = []
+        for (let i = 0; i < 20; i++) { mixed.push(a.next()); b.next() }
+        compare(mixed, alone, "drawing from one doesn't disturb another")
+    }
     function test_range() {
-        for (const v of draw(7, 10000)) verify(v >= 0 && v < 1)
+        for (const v of draw(a, 7, 10000)) verify(v >= 0 && v < 1)
     }
     function test_spread() {
-        const v = draw(3, 10000)
-        const mean = v.reduce((a, b) => a + b, 0) / v.length
+        const v = draw(a, 3, 10000)
+        const mean = v.reduce((x, y) => x + y, 0) / v.length
         verify(Math.abs(mean - 0.5) < 0.02, "mean " + mean)
     }
 }

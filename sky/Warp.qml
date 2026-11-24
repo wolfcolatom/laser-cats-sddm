@@ -6,7 +6,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import "../style"
-import "Rng.js" as Rng
 
 Item {
     id: warpScene
@@ -18,6 +17,8 @@ Item {
     required property bool playing      // the cat's animation plays (off while held still:
                                         // then it shows its last frame, the roar)
     required property var cat           // the warp cat (Cats.js)
+    required property int seed          // for its random numbers
+    Rng { id: rng; seed: warpScene.seed }
 
     // warp speed: streaks rushing out from the centre while warp goes 0 -> 1
     Item {
@@ -27,11 +28,11 @@ Item {
         Repeater {
             model: warpScene.warp > 0 ? 280 : 0
             Rectangle {
-                readonly property real angle: Rng.next() * 2 * Math.PI
-                readonly property real r0: 30 + Rng.next() * 520
+                readonly property real angle: rng.next() * 2 * Math.PI
+                readonly property real r0: 30 + rng.next() * 520
                 readonly property real reach: Math.max(warpScene.width, warpScene.height)
-                readonly property real k: 0.6 + Rng.next() * 0.6        // fixed per streak
-                readonly property real len: 120 + Rng.next() * 260
+                readonly property real k: 0.6 + rng.next() * 0.6        // fixed per streak
+                readonly property real len: 120 + rng.next() * 260
                 readonly property real r: r0 + warpScene.warp * warpScene.warp * reach * k
                 width: 4 + warpScene.warp * warpScene.warp * len; height: 2.5; radius: 1.25
                 x: warpScene.width / 2 + Math.cos(angle) * r - width / 2

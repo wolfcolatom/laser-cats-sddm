@@ -5,13 +5,14 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import "../style"
-import "Rng.js" as Rng
 
 // a comet, every 25-50 s: a slow crossing with a long jade tail
 Item {
     id: comet
     required property bool running      // shown
     required property bool active       // crossing now and then (off while held still)
+    required property int seed          // for its random numbers
+    Rng { id: rng; seed: comet.seed }
     required property real areaWidth    // the sky it crosses
     required property real areaHeight
     function show() { cometTimer.triggered() }     // (for testing)
@@ -52,10 +53,10 @@ Item {
         id: cometTimer
         interval: 12000; repeat: true; running: comet.active
         onTriggered: {
-            interval = 25000 + Rng.next() * 25000
-            comet.rotation = 6 + Rng.next() * 16
-            comet.x0 = -comet.width + Rng.next() * comet.areaWidth * 0.2
-            comet.y0 = Rng.next() * comet.areaHeight * 0.45
+            interval = 25000 + rng.next() * 25000
+            comet.rotation = 6 + rng.next() * 16
+            comet.x0 = -comet.width + rng.next() * comet.areaWidth * 0.2
+            comet.y0 = rng.next() * comet.areaHeight * 0.45
             cometRun.start()
         }
     }
