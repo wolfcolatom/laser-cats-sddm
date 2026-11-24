@@ -16,10 +16,6 @@
         <translation>Contraseña incorrecta</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Contraseña</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Bloq Mayús está activado</translation>
     </message>

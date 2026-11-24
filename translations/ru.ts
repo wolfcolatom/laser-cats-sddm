@@ -16,10 +16,6 @@
         <translation>Неверный пароль</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Включён Caps Lock</translation>
     </message>

@@ -4,6 +4,15 @@ All notable changes to Laser Cats. Versions follow
 [semantic versioning](https://semver.org); the format follows
 [Keep a Changelog](https://keepachangelog.com).
 
+## [1.7.1] - 2026-11-24
+
+### Fixed
+- "Wrong password" was never shown. It was the password field's
+  placeholder, and Qt hides a centred field's placeholder while the field
+  has focus, which on a login screen is always; a wrong password gave only
+  the shake and the amber wash. It is now a line under the field, shown
+  until the next password is being typed.
+
 ## [1.7] - 2026-11-24
 
 Nothing looks different; this release is about how the theme is built.
@@ -161,6 +170,7 @@ Nothing looks different; this release is about how the theme is built.
 
 First release.
 
+[1.7.1]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7.1
 [1.7]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7
 [1.6]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.6
 [1.5]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.5

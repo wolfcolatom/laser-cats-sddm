@@ -82,7 +82,15 @@ Item {
             tryVerify(() => fake.logins.length === 1, 4000)
             tryVerify(() => !controller().busy, 1000)
             compare(field().text, "")
-            compare(field().placeholderText, "Wrong password")
+            verify(field().activeFocus)
+            // seen by the user: a line of its own, showing, not a placeholder
+            // (a centred field hides its placeholder while it has focus)
+            const wrong = part("wrongPassword")
+            verify(wrong.visible && wrong.height > 0 && wrong.opacity === 1)
+            compare(wrong.text, "Wrong password")
+            compare(field().placeholderText, "Password")
+            keyClick("x")
+            verify(!wrong.visible, "gone once the next one is being typed")
             verify(field().activeFocus, "ready for another try")
             tryVerify(() => sky().blast === 0, 3000)
         }
@@ -223,6 +231,9 @@ Item {
         }
 
         // ---- warnings and messages
+        function test_noWrongPasswordLineAtFirst() {
+            verify(!part("wrongPassword").visible)
+        }
         function test_capsLockWarning() {
             const warning = part("capsWarning")
             verify(!warning.visible)
@@ -254,7 +265,7 @@ Item {
             const place = drawnAt()
             submit("nope")
             tryVerify(() => drawnAt() !== place, 1000, "it shakes")
-            tryCompare(field(), "placeholderText", "Wrong password")
+            tryCompare(part("wrongPassword"), "visible", true)
             tryVerify(() => drawnAt() === place, 1000, "and ends where it started")
             compare(field().x, field().parent.width / 2 - field().width / 2, "still centred in the layout")
         }

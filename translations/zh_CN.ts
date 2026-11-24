@@ -16,10 +16,6 @@
         <translation>密码错误</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>密码</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>大写锁定已开启</translation>
     </message>

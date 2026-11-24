@@ -16,10 +16,6 @@
         <translation>Mot de passe incorrect</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Verr. Maj est activé</translation>
     </message>

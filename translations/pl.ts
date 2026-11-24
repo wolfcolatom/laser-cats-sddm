@@ -16,10 +16,6 @@
         <translation>Nieprawidłowe hasło</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Hasło</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Caps Lock jest włączony</translation>
     </message>

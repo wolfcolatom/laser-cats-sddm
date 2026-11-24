@@ -16,10 +16,6 @@
         <translation>Senha incorreta</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Senha</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Caps Lock está ativado</translation>
     </message>

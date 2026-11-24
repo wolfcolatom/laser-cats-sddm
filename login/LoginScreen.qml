@@ -147,7 +147,6 @@ Rectangle {
                 enabled: !login.busy && screen.primary
                 accent: settings.accent
                 capsLock: screen.backend.capsLock
-                placeholderText: login.rejected ? qsTr("Wrong password") : qsTr("Password")
                 // the field is emptied at once: the password lives on only in the controller
                 onAccepted: {
                     const typed = text
@@ -156,6 +155,19 @@ Rectangle {
                 }
                 onTextChanged: if (text !== "") login.clearMessage()
                 onKeyTyped: sky.keyPressed()
+            }
+            // "Wrong password", until the next one is being typed. Under the
+            // field, not as its placeholder: Qt hides a centred field's
+            // placeholder while the field has focus, which here is always.
+            Text {
+                objectName: "wrongPassword"
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: login.rejected && password.text === ""
+                text: qsTr("Wrong password")
+                color: Theme.amber
+                font.pixelSize: 15
+                Accessible.role: Accessible.AlertMessage
+                Accessible.name: text
             }
             // Caps Lock warning: amber (it needs attention), only while it's on
             Text {

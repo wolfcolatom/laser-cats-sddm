@@ -16,10 +16,6 @@
         <translation>Password errata</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Password</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Bloc Maiusc è attivo</translation>
     </message>

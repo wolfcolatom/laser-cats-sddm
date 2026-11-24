@@ -16,10 +16,6 @@
         <translation>Falsches Passwort</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Passwort</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Feststelltaste ist aktiv</translation>
     </message>

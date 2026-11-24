@@ -16,10 +16,6 @@
         <translation>Onjuist wachtwoord</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Wachtwoord</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Caps Lock staat aan</translation>
     </message>

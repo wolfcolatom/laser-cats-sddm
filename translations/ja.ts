@@ -16,10 +16,6 @@
         <translation>パスワードが違います</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>パスワード</translation>
-    </message>
-    <message>
         <source>Caps Lock is on</source>
         <translation>Caps Lock がオンです</translation>
     </message>
