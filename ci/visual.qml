@@ -6,7 +6,7 @@
 //   QT_QPA_PLATFORM=offscreen qml ci/visual.qml -- OUTDIR
 import QtQuick
 import QtQuick.Window
-import ".."
+import "../sky"
 
 Window {
     id: win

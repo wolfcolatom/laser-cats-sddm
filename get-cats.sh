@@ -42,7 +42,7 @@ while [ $# -gt 0 ]; do
 done
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 theme=$(cd "${1:-$here}" && pwd)
-[ -f "$theme/Sky.qml" ] && [ -d "$theme/assets" ] || { echo "Not a Laser Cats theme folder: $theme" >&2; exit 1; }
+[ -f "$theme/sky/Sky.qml" ] && [ -d "$theme/assets" ] || { echo "Not a Laser Cats theme folder: $theme" >&2; exit 1; }
 tools="$here/get-cats"
 CATS=(cat-a-jade.webp cat-b-mint.webp planet-cat.png spiral-cat.webp)
 

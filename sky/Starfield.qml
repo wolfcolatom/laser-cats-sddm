@@ -37,7 +37,7 @@ Item {
                 model: Math.ceil(starfield.width / band.tw) + 1
                 Image {
                     required property int index
-                    source: "assets/" + band.file + ".png"
+                    source: "../assets/" + band.file + ".png"
                     asynchronous: true
                     smooth: band.s !== Math.round(band.s)   // crisp at 1x and 2x, soft in between
                     x: Math.round(band.offset + (index - 1) * band.tw); y: 0

@@ -3,7 +3,7 @@
 // The seeded random numbers (Rng.js) the sky uses.
 import QtQuick
 import QtTest
-import "../Rng.js" as Rng
+import "../sky/Rng.js" as Rng
 
 TestCase {
     name: "Rng"

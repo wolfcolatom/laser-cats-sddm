@@ -18,9 +18,9 @@ QTBIN     ?= /usr/lib/qt6/bin
 QML_ENV   := QT_QPA_PLATFORM=offscreen QT_FORCE_STDERR_LOGGING=1
 
 # what goes into an installed theme (and the release archive)
-FILES     := $(wildcard *.qml) $(wildcard *.js) metadata.desktop theme.conf preview.jpg \
+FILES     := Main.qml metadata.desktop theme.conf preview.jpg \
              get-cats.sh LICENSE README.md CREDITS.md CHANGELOG.md
-DIRS      := assets get-cats tools LICENSES
+DIRS      := sky login style assets get-cats tools LICENSES
 QM        := $(patsubst %.ts,%.qm,$(wildcard translations/*.ts))
 LANGS     := $(basename $(notdir $(wildcard translations/*.ts)))
 
@@ -56,11 +56,12 @@ versions:
 
 # VirtualKeyboard.qml needs qt6-virtualkeyboard; it's skipped if that isn't installed
 HAVE_VK   := $(wildcard /usr/lib/qt6/qml/QtQuick/VirtualKeyboard)
-LINT      := $(if $(HAVE_VK),$(wildcard *.qml),$(filter-out VirtualKeyboard.qml,$(wildcard *.qml))) ci/*.qml tests/*.qml
+QMLFILES  := Main.qml $(wildcard sky/*.qml login/*.qml style/*.qml ci/*.qml tests/*.qml)
+LINT      := $(if $(HAVE_VK),$(QMLFILES),$(filter-out login/VirtualKeyboard.qml,$(QMLFILES)))
 
 lint:
 	$(if $(HAVE_VK),,@echo "(qt6-virtualkeyboard not installed: not linting VirtualKeyboard.qml)")
-	$(QTBIN)/qmllint --max-warnings 0 $(LINT)
+	$(QTBIN)/qmllint --max-warnings 0 $(abspath $(LINT))   # (absolute paths: qmllint needs them to match qmldir singletons)
 
 test:
 	$(QML_ENV) $(QTBIN)/qmltestrunner -input tests

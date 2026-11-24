@@ -4,7 +4,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 // a comet, every 25-50 s: a slow crossing with a long jade tail
@@ -28,15 +28,15 @@ Item {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
             GradientStop { position: 0.55; color: Qt.rgba(0.196, 0.561, 0.494, 0.45) }
-            GradientStop { position: 0.9; color: Palette.mint }
-            GradientStop { position: 1.0; color: Palette.white }
+            GradientStop { position: 0.9; color: Theme.mint }
+            GradientStop { position: 1.0; color: Theme.white }
         }
     }
     Rectangle {           // the head, with a soft glow
         x: parent.width - 9; anchors.verticalCenter: parent.verticalCenter
-        width: 12; height: 12; radius: 6; color: Palette.white
+        width: 12; height: 12; radius: 6; color: Theme.white
         layer.enabled: true
-        layer.effect: MultiEffect { blurEnabled: true; blur: 0.4; shadowEnabled: true; shadowColor: Palette.mint; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
+        layer.effect: MultiEffect { blurEnabled: true; blur: 0.4; shadowEnabled: true; shadowColor: Theme.mint; shadowBlur: 1.0; shadowHorizontalOffset: 0; shadowVerticalOffset: 0 }
     }
     ParallelAnimation {
         id: cometRun

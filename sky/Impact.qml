@@ -6,7 +6,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -14,7 +14,7 @@ Item {
     width: 0; height: 0
     visible: p < 1
     property real p: 1                      // 0 -> 1 over the burst
-    property color colour: Palette.amber
+    property color colour: Theme.amber
     property real outward: 0                // direction off the surface (radians)
     property var dirs: []                   // each spark's direction and reach
     property var reach: []
@@ -43,7 +43,7 @@ Item {
     }
     Rectangle {                             // its white-hot centre
         x: -4; y: -4; width: 8; height: 8; radius: 4
-        color: Palette.white
+        color: Theme.white
         opacity: Math.max(0, 1 - impact.p * 3)
     }
     Repeater {                              // sparks
@@ -55,7 +55,7 @@ Item {
             width: 2 + 7 * (1 - impact.p); height: 2; radius: 1
             x: Math.cos(a) * d - width / 2; y: Math.sin(a) * d - 1
             rotation: a * 180 / Math.PI
-            color: index % 3 === 0 ? Palette.white : impact.colour
+            color: index % 3 === 0 ? Theme.white : impact.colour
             opacity: Math.max(0, 1 - impact.p * 1.15)
         }
     }

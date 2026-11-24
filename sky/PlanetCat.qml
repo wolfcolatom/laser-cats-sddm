@@ -10,7 +10,7 @@
 // scales it.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -21,7 +21,7 @@ Item {
     required property real boom         // 0 -> 1 when the right password goes in: the planet
                                         // blows apart and the cat is blasted away
     required property var cat           // its picture, paws and beams (Cats.js)
-    property url planet: "assets/planet-jade.png"   // or planet-earth.png
+    property url planet: "../assets/planet-jade.png"   // or planet-earth.png
     property real homeX: 0              // where it floats around
     property real homeY: 0
     property real rhythm: 0             // gives each copy its own floating rhythm
@@ -31,7 +31,7 @@ Item {
     readonly property int fireballSpreadMs: 520
     readonly property real biteChance: 0.35         // about one hit in three chips the planet
     readonly property real amberChance: 0.6         // fireballs: amber, else mint
-    readonly property list<color> colours: [Palette.jade, Palette.mint, Palette.amber]   // beams cycle through these
+    readonly property list<color> colours: [Theme.jade, Theme.mint, Theme.amber]   // beams cycle through these
 
     // the planet: centre and radius in the box (the pictures' disc is 210 px)
     readonly property point centre: Qt.point(220, 330)
@@ -64,7 +64,7 @@ Item {
         id: stillPic
         visible: !planetCat.cat.animated
         asynchronous: true
-        source: planetCat.cat.animated ? "" : "assets/" + planetCat.cat.file
+        source: planetCat.cat.animated ? "" : "../assets/" + planetCat.cat.file
         x: planetCat.cat.x; y: planetCat.cat.y - planetCat.e * 260
         width: sourceSize.width * planetCat.cat.scale; height: sourceSize.height * planetCat.cat.scale
         smooth: true
@@ -76,7 +76,7 @@ Item {
         visible: planetCat.cat.animated
         asynchronous: true
         playing: planetCat.active
-        source: planetCat.cat.animated ? "assets/" + planetCat.cat.file : ""
+        source: planetCat.cat.animated ? "../assets/" + planetCat.cat.file : ""
         x: planetCat.cat.x; y: planetCat.cat.y - planetCat.e * 260
         width: sourceSize.width * planetCat.cat.scale; height: sourceSize.height * planetCat.cat.scale
         smooth: true
@@ -157,14 +157,14 @@ Item {
     }
     // typing the password: every 2nd key (Sky.keyPressed) chips a piece off
     function keyChip() {
-        if (active && boom <= 0) hitBeam(Palette.amber, true)
+        if (active && boom <= 0) hitBeam(Theme.amber, true)
     }
     // and on its own, a fireball now and then
     Timer {
         interval: 160; repeat: true; running: planetCat.active && planetCat.boom <= 0
         onTriggered: {
             interval = planetCat.fireballMinMs + Rng.next() * planetCat.fireballSpreadMs
-            planetCat.hitBeam(Rng.next() < planetCat.amberChance ? Palette.amber : Palette.mint, false)
+            planetCat.hitBeam(Rng.next() < planetCat.amberChance ? Theme.amber : Theme.mint, false)
         }
     }
 }

@@ -5,7 +5,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -23,7 +23,7 @@ Item {
     Item {
         anchors.fill: parent
         visible: warpScene.warp > 0
-        Rectangle { anchors.fill: parent; color: "#000000"; opacity: warpScene.warp * 0.55 }
+        Rectangle { anchors.fill: parent; color: Theme.backdrop; opacity: warpScene.warp * 0.55 }
         Repeater {
             model: warpScene.warp > 0 ? 280 : 0
             Rectangle {
@@ -41,8 +41,8 @@ Item {
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
                     GradientStop { position: 0.0; color: "transparent" }
-                    GradientStop { position: 0.7; color: Palette.mint }
-                    GradientStop { position: 1.0; color: Palette.white }
+                    GradientStop { position: 0.7; color: Theme.mint }
+                    GradientStop { position: 1.0; color: Theme.white }
                 }
             }
         }
@@ -58,7 +58,7 @@ Item {
         z: 11
         readonly property real fadeIn: Math.max(Math.min(1, Math.max(0, warpScene.blast - 0.45) * 2.5), Math.min(1, warpScene.warp * 4))
         visible: opacity > 0.01
-        source: "assets/" + warpScene.cat.file
+        source: "../assets/" + warpScene.cat.file
         playing: visible && warpScene.playing
         onVisibleChanged: if (visible) currentFrame = warpScene.playing ? 0 : frameCount - 1
         onStatusChanged: if (status === AnimatedImage.Ready && !warpScene.playing) currentFrame = frameCount - 1
@@ -72,7 +72,7 @@ Item {
         layer.enabled: visible
         layer.effect: MultiEffect {
             shadowEnabled: true
-            shadowColor: Palette.mint
+            shadowColor: Theme.mint
             shadowOpacity: 0.9
             shadowBlur: 1.0
             blurMax: 48
@@ -105,8 +105,8 @@ Item {
         Repeater {
             // one beam per eye (where the eyes are: Cats.js): jade to the
             // left, amber to the right, each sweeping a little
-            model: [ { fx: warpScene.cat.eyes[0].x, fy: warpScene.cat.eyes[0].y, angle: 196, sweep: -14, col: Palette.jade, clear: Palette.jadeClear },
-                     { fx: warpScene.cat.eyes[1].x, fy: warpScene.cat.eyes[1].y, angle: -16, sweep: 14, col: Palette.amber, clear: Palette.amberClear } ]
+            model: [ { fx: warpScene.cat.eyes[0].x, fy: warpScene.cat.eyes[0].y, angle: 196, sweep: -14, col: Theme.jade },
+                     { fx: warpScene.cat.eyes[1].x, fy: warpScene.cat.eyes[1].y, angle: -16, sweep: 14, col: Theme.amber } ]
             Item {
                 required property var modelData
                 id: shot
@@ -123,7 +123,7 @@ Item {
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
                         GradientStop { position: 0.0; color: shot.modelData.col }
-                        GradientStop { position: 1.0; color: shot.modelData.clear }
+                        GradientStop { position: 1.0; color: Theme.clear(shot.modelData.col) }
                     }
                 }
                 Rectangle {                     // the beam: white-hot at the eye, then its colour, fading out
@@ -133,13 +133,13 @@ Item {
                     opacity: shot.show
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: "#f2f6f9" }
+                        GradientStop { position: 0.0; color: Theme.white }
                         GradientStop { position: 0.12; color: shot.modelData.col }
-                        GradientStop { position: 1.0; color: shot.modelData.clear }
+                        GradientStop { position: 1.0; color: Theme.clear(shot.modelData.col) }
                     }
                 }
                 Image {                         // the flash in the eye
-                    source: "assets/glow.png"
+                    source: "../assets/glow.png"
                     width: 150 * warpScene.catScale * (0.5 + warpLasers.p); height: width
                     x: shot.at.x - width / 2; y: shot.at.y - height / 2
                     opacity: warpLasers.fade * Math.min(1, warpLasers.p * 4)

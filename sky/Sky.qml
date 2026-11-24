@@ -5,9 +5,8 @@
 // stars, and the explosion and warp played when you log in.
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Effects
 import "Cats.js" as Cats
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -103,7 +102,7 @@ Item {
         cat: root.cats.planetCat
         // flashes on key presses / goes amber on a wrong password, like the floating cats
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
-        layer.effect: MultiEffect { brightness: root.flash * 0.25; colorization: root.alarm * 0.75; colorizationColor: Palette.amber }
+        layer.effect: FlashEffect { flash: root.flash; alarm: root.alarm }
         homeX: root.width * 0.05; homeY: root.height * 0.01
         transform: Scale { xScale: root.planetScale; yScale: root.planetScale }
     }
@@ -114,9 +113,9 @@ Item {
         boom: root.blast
         cat: root.cats.planetCat
         layer.enabled: root.flash > 0.01 || root.alarm > 0.01
-        layer.effect: MultiEffect { brightness: root.flash * 0.25; colorization: root.alarm * 0.75; colorizationColor: Palette.amber }
+        layer.effect: FlashEffect { flash: root.flash; alarm: root.alarm }
         rhythm: 2.3
-        planet: "assets/planet-earth.png"       // an Earth-style planet on this side
+        planet: "../assets/planet-earth.png"       // an Earth-style planet on this side
         // 60% size and mirrored (faces the other way): mirror about its middle,
         // then shrink from its top-left corner, so it covers homeX .. homeX + 276
         // (times planetScale)

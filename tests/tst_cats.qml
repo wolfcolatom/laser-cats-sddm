@@ -4,7 +4,7 @@
 // position lies inside its picture (in every frame), so the lasers line up.
 import QtQuick
 import QtTest
-import "../Cats.js" as Cats
+import "../sky/Cats.js" as Cats
 
 Item {
     id: host

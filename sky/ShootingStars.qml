@@ -3,7 +3,7 @@
 // Laser Cats: shooting stars.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -25,8 +25,8 @@ Item {
             gradient: Gradient {
                 orientation: Gradient.Horizontal
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.6; color: Palette.mint }      // a mint trail
-                GradientStop { position: 1.0; color: Palette.white }
+                GradientStop { position: 0.6; color: Theme.mint }      // a mint trail
+                GradientStop { position: 1.0; color: Theme.white }
             }
             property real x0: 0
             property real y0: 0

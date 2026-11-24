@@ -7,7 +7,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Shapes
-import "Palette.js" as Palette
+import "../style"
 import "Rng.js" as Rng
 
 Item {
@@ -67,7 +67,7 @@ Item {
         x: 0; y: beam.height / 2 - 1; width: beam.len; height: 2; radius: 1
         gradient: Gradient {
             orientation: Gradient.Horizontal
-            GradientStop { position: 0.0; color: Palette.white }
+            GradientStop { position: 0.0; color: Theme.white }
             GradientStop { position: 0.6; color: Qt.rgba(1, 1, 1, 0.35) }
             GradientStop { position: 1.0; color: "transparent" }
         }

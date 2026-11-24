@@ -24,7 +24,7 @@ Item {
             id: planet
             required property var modelData
             asynchronous: true          // load in the background: the screen shows at once
-            source: "assets/planet-" + modelData.file + ".png"
+            source: "../assets/planet-" + modelData.file + ".png"
             smooth: true
             opacity: modelData.opacity
             width: sourceSize.width * drifting.catScale; height: sourceSize.height * drifting.catScale

@@ -3,8 +3,7 @@
 // Laser Cats: the laser cats floating across the sky.
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Effects
-import "Palette.js" as Palette
+import "../style"
 
 // the floating cats, in one layer so they can flash brighter on a key
 // press and wash amber on a wrong password, all together
@@ -20,11 +19,7 @@ Item {
     required property var cats          // the floating cats to show (Cats.js)
     anchors.fill: parent
     layer.enabled: flash > 0.01 || alarm > 0.01
-    layer.effect: MultiEffect {
-        brightness: catLayer.flash * 0.25
-        colorization: catLayer.alarm * 0.75
-        colorizationColor: Palette.amber
-    }
+    layer.effect: FlashEffect { flash: catLayer.flash; alarm: catLayer.alarm }
 
     // single laser cats, floating right with the stars, one per lane,
     // starting spread around the loop so they pass rather than pile up; some
@@ -37,7 +32,7 @@ Item {
             required property int index
             asynchronous: true          // load in the background: the lock shows at once
             id: floater
-            source: "assets/" + modelData.file
+            source: "../assets/" + modelData.file
             width: sourceSize.width * modelData.s * catLayer.catScale; height: sourceSize.height * modelData.s * catLayer.catScale
             smooth: true
             mirror: modelData.mirror

@@ -7,7 +7,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Particles
-import "Palette.js" as Palette
+import "../style"
 
 Item {
     id: fire
@@ -35,16 +35,16 @@ Item {
     ImageParticle {
         anchors.fill: parent
         system: blaze; groups: ["smoke"]
-        source: "assets/smoke.png"
-        color: "#30302c"; colorVariation: 0.05
+        source: "../assets/smoke.png"
+        color: Theme.smoke; colorVariation: 0.05
         alpha: 0.35; alphaVariation: 0.1
         entryEffect: ImageParticle.Fade
     }
     ImageParticle {
         anchors.fill: parent
         system: blaze; groups: ["fire"]
-        source: "assets/glow.png"
-        color: Palette.amber; colorVariation: 0.12
+        source: "../assets/glow.png"
+        color: Theme.amber; colorVariation: 0.12
         redVariation: 0.05; greenVariation: 0.15
         alpha: 0.85
         entryEffect: ImageParticle.Scale
@@ -52,25 +52,25 @@ Item {
     ImageParticle {                         // impact smoke, rolling out of the fireballs
         anchors.fill: parent
         system: blaze; groups: ["puff"]
-        source: "assets/smoke.png"
-        color: "#3b332b"; colorVariation: 0.06
+        source: "../assets/smoke.png"
+        color: Theme.impactSmoke; colorVariation: 0.06
         alpha: 0.45; alphaVariation: 0.1
         entryEffect: ImageParticle.Fade
     }
     ImageParticle {                         // the little flames
         anchors.fill: parent
         system: blaze; groups: ["flame"]
-        source: "assets/flame.png"          // a teardrop pointing the way it moves
+        source: "../assets/flame.png"          // a teardrop pointing the way it moves
         autoRotation: true
-        color: "#ff8a26"; colorVariation: 0.08
+        color: Theme.flame; colorVariation: 0.08
         alpha: 0.6; alphaVariation: 0.12
         entryEffect: ImageParticle.Scale
     }
     ImageParticle {                         // impact fireballs: orange
         anchors.fill: parent
         system: blaze; groups: ["ball"]
-        source: "assets/glow.png"
-        color: "#ff8a30"; colorVariation: 0.1
+        source: "../assets/glow.png"
+        color: Theme.fireball; colorVariation: 0.1
         redVariation: 0.04; greenVariation: 0.12
         alpha: 1.0
         entryEffect: ImageParticle.Fade
@@ -78,31 +78,31 @@ Item {
     ImageParticle {                         // their white-hot middles
         anchors.fill: parent
         system: blaze; groups: ["ballcore"]
-        source: "assets/glow.png"
-        color: "#fff1c4"
+        source: "../assets/glow.png"
+        color: Theme.fireCore
         alpha: 0.95
         entryEffect: ImageParticle.Fade
     }
     ImageParticle {                         // chunks of planet chipped off by the lasers
         anchors.fill: parent
         system: blaze; groups: ["chip"]
-        source: "assets/rock-2.png"
-        color: "#8a7a6a"; colorVariation: 0.15
+        source: "../assets/rock-2.png"
+        color: Theme.rock; colorVariation: 0.15
         rotationVariation: 180; rotationVelocityVariation: 260
         entryEffect: ImageParticle.None
     }
     ImageParticle {                         // hot debris thrown off the impacts
         anchors.fill: parent
         system: blaze; groups: ["debris"]
-        source: "assets/glow.png"
-        color: "#ffc874"; colorVariation: 0.1
+        source: "../assets/glow.png"
+        color: Theme.debris; colorVariation: 0.1
         alpha: 0.95
     }
     ImageParticle {
         anchors.fill: parent
         system: blaze; groups: ["ember"]
-        source: "assets/glow.png"
-        color: Palette.flare; colorVariation: 0.1
+        source: "../assets/glow.png"
+        color: Theme.flare; colorVariation: 0.1
         alpha: 0.9
     }
     // fire where each beam lands (follows the sweep), flying off the surface

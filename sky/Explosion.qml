@@ -6,7 +6,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import "Palette.js" as Palette
+import "../style"
 
 Item {
     id: explosion
@@ -23,7 +23,7 @@ Item {
         visible: explosion.boom > 0 && opacity > 0
         width: explosion.radius * 2 * (0.8 + explosion.e * 1.2); height: width; radius: width / 2
         x: explosion.centre.x - width / 2; y: explosion.centre.y - height / 2
-        color: Palette.flare
+        color: Theme.flare
         opacity: Math.max(0, 0.95 - explosion.e * 2.8)
         layer.enabled: visible
         layer.effect: MultiEffect { blurEnabled: true; blur: 1.0; blurMax: 48 }
@@ -37,7 +37,7 @@ Item {
             width: 18 + 40 * explosion.e * (1 - explosion.e) * 4; height: 2.5; radius: 1.25
             x: explosion.centre.x + Math.cos(a) * d - width / 2; y: explosion.centre.y + Math.sin(a) * d - 1
             rotation: a * 180 / Math.PI
-            color: index % 3 === 0 ? Palette.white : index % 3 === 1 ? Palette.amber : Palette.flare
+            color: index % 3 === 0 ? Theme.white : index % 3 === 1 ? Theme.amber : Theme.flare
             opacity: Math.max(0, 1 - explosion.e * 1.1)
         }
     }
@@ -48,7 +48,7 @@ Item {
             asynchronous: true
             readonly property real a: index / explosion.rocks * 2 * Math.PI + Math.sin(index * 7.3) * 0.25
             readonly property real reach: 260 + 220 * Math.abs(Math.sin(index * 3.1))
-            source: "assets/rock-" + (index % 4 + 1) + ".png"
+            source: "../assets/rock-" + (index % 4 + 1) + ".png"
             smooth: true
             scale: 2.2 - (index % 4) * 0.35
             x: explosion.centre.x + Math.cos(a) * explosion.e * reach - width / 2

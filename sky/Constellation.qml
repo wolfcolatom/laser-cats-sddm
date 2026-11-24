@@ -3,7 +3,7 @@
 // Laser Cats: a cat-head constellation drifting across the sky.
 pragma ComponentBehavior: Bound
 import QtQuick
-import "Palette.js" as Palette
+import "../style"
 
 // a cat constellation: a few stars joined by faint jade lines in the
 // shape of a cat's head (ears, cheeks, chin, eyes, nose), drifting slowly
@@ -40,7 +40,7 @@ Canvas {
             let g = c.createRadialGradient(x, y, 0, x, y, big * 4)
             g.addColorStop(0, "rgba(196, 236, 228, 0.55)"); g.addColorStop(1, "rgba(141, 210, 198, 0)")
             c.fillStyle = g; c.beginPath(); c.arc(x, y, big * 4, 0, 2 * Math.PI); c.fill()
-            c.fillStyle = Palette.white; c.beginPath(); c.arc(x, y, big, 0, 2 * Math.PI); c.fill()
+            c.fillStyle = Theme.white; c.beginPath(); c.arc(x, y, big, 0, 2 * Math.PI); c.fill()
         }
     }
 }

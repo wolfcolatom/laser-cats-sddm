@@ -5,7 +5,7 @@
 // text (AA); the clock and date are large text (3:1).
 import QtQuick
 import QtTest
-import "../Palette.js" as Palette
+import "../style"
 
 TestCase {
     name: "Contrast"
@@ -21,14 +21,14 @@ TestCase {
     }
     // [what, text colour, background, minimum]
     readonly property var pairs: [
-        ["password text on the field", Palette.white, "#121513", 4.5],
+        ["password text on the field", Theme.white, "#121513", 4.5],
         ["placeholder / names on the field", "#8a958e", "#121513", 4.5],
         ["user name on the sky", "#8a958e", "#000000", 4.5],
-        ["Caps Lock warning", Palette.amber, "#000000", 4.5],
-        ["SDDM message", Palette.white, "#000000", 4.5],
+        ["Caps Lock warning", Theme.amber, "#000000", 4.5],
+        ["SDDM message", Theme.white, "#000000", 4.5],
         ["session picker text", "#8a958e", "#1f2421", 4.5],
-        ["clock (large)", Palette.white, "#000000", 3],
-        ["date (large)", Palette.mint, "#000000", 3]
+        ["clock (large)", Theme.white, "#000000", 3],
+        ["date (large)", Theme.mint, "#000000", 3]
     ]
     function test_contrast_data() { return pairs.map(p => ({ tag: p[0], fg: p[1], bg: p[2], min: p[3] })) }
     function test_contrast(d) {

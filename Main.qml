@@ -9,22 +9,21 @@ pragma ComponentBehavior: Bound
 // qmllint disable unqualified
 import QtQuick
 import QtQuick.Controls.Basic
+import "sky"
+import "style"
 
 Rectangle {
     id: root
     width: 1920; height: 1080
-    color: "#000000"
+    color: Theme.backdrop
     // right-to-left languages: the layout mirrors
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    readonly property color accent: config.accent || "#43af9c"
-    readonly property color text: "#f2f4f3"
-    readonly property color subtext: "#8a958e"
+    readonly property color accent: config.accent || Theme.jade
     // the text uses the system's own font (no family set), except the clock
     // Space Grotesk (SIL Open Font License, assets/OFL-SpaceGrotesk.txt) for the clock and date
     FontLoader { id: clockFont; source: "assets/SpaceGrotesk.ttf" }
-    readonly property bool lasers: true
     // calm in theme.conf: no explosion or warp (logs straight in), no
     // flashing on key presses, no shooting stars or comet.
     //   auto (the default)  calm only without GPU acceleration, when Qt's
@@ -43,9 +42,10 @@ Rectangle {
     // a message from SDDM (an account locked, a password expiring...)
     property string message: ""
     property int session: sessionModel.lastIndex
-    // the last user, or else the first one on the system (role 257 = "name")
+    // the last user, or else the first one on the system
+    readonly property int nameRole: Qt.UserRole + 1         // SDDM's user model: "name"
     property string user: userModel.lastUser !== "" ? userModel.lastUser
-                          : userModel.data(userModel.index(0, 0), 257) || ""
+                          : userModel.data(userModel.index(0, 0), nameRole) || ""
 
     // SDDM closes the login screen the moment a password is accepted, so the
     // planets blow up (and the warp plays) first, and only then does the
@@ -101,7 +101,6 @@ Rectangle {
         id: sky
         objectName: "sky"
         anchors.fill: parent
-        visible: root.lasers
         calm: root.gentle
         frozen: root.stillSky
         // the classic GIF cats, once get-cats.sh has made them (it sets classic=true)
@@ -115,7 +114,6 @@ Rectangle {
     // soft dark patches under the clock / password and the session picker,
     // so the stars don't get in the way of reading them
     Image {
-        visible: root.lasers
         opacity: root.clear
         source: "assets/text-shade.png"
         anchors.horizontalCenter: parent.horizontalCenter
@@ -123,7 +121,6 @@ Rectangle {
         anchors.verticalCenterOffset: 20
     }
     Image {
-        visible: root.lasers
         source: "assets/corner-shade.png"
         anchors { left: parent.left; bottom: parent.bottom; leftMargin: -40; bottomMargin: -16 }
     }
@@ -160,11 +157,11 @@ Rectangle {
         readonly property int split: clock.text.indexOf(":")
         TextMetrics { id: mDigit; font: clock.font; text: "9" }
         TextMetrics { id: mColon; font: clock.font; text: ":" }
-        Text { text: parent.split < 0 ? clock.text : clock.text.slice(0, parent.split); color: root.text; font: clock.font }
-        Text { objectName: "clockColon"; visible: parent.split >= 0; text: ":"; color: root.text; font: clock.font
+        Text { text: parent.split < 0 ? clock.text : clock.text.slice(0, parent.split); color: Theme.text; font: clock.font }
+        Text { objectName: "clockColon"; visible: parent.split >= 0; text: ":"; color: Theme.text; font: clock.font
                transform: Translate { y: (mDigit.tightBoundingRect.y + mDigit.tightBoundingRect.height / 2)
                                          - (mColon.tightBoundingRect.y + mColon.tightBoundingRect.height / 2) } }
-        Text { visible: parent.split >= 0; text: clock.text.slice(parent.split + 1); color: root.text; font: clock.font }
+        Text { visible: parent.split >= 0; text: clock.text.slice(parent.split + 1); color: Theme.text; font: clock.font }
     }
     Text {
         id: date
@@ -172,7 +169,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: clock.bottom
         anchors.topMargin: 4
-        color: "#8dd2c6"   // soft mint date
+        color: Theme.mint
         opacity: root.clear
         font { family: clockFont.name; pixelSize: 24; variableAxes: ({ "wght": 400 }) }
         text: Qt.locale().toString(root.now, root.dateFormat)
@@ -194,7 +191,7 @@ Rectangle {
         Text {
             visible: userPicker.count <= 1
             anchors.horizontalCenter: parent.horizontalCenter
-            color: root.subtext
+            color: Theme.subtext
             font { pixelSize: 18; weight: Font.DemiBold }
             text: root.user
         }
@@ -214,16 +211,16 @@ Rectangle {
             contentItem: Text {
                 id: nameLabel
                 text: userPicker.displayText
-                color: root.subtext
+                color: Theme.subtext
                 font: userPicker.font
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
             indicator: Text { x: userPicker.width - width - 16; anchors.verticalCenter: parent.verticalCenter
-                              text: "▾"; color: root.subtext; font.pixelSize: 14 }
-            background: Rectangle { radius: height / 2; color: userPicker.hovered ? "#161917" : "transparent"
+                              text: "▾"; color: Theme.subtext; font.pixelSize: 14 }
+            background: Rectangle { radius: height / 2; color: userPicker.hovered ? Theme.faintHover : "transparent"
                                     border.width: userPicker.visualFocus ? 2 : 1
-                                    border.color: userPicker.visualFocus ? root.accent : userPicker.hovered ? "#1f2421" : "transparent" }
+                                    border.color: userPicker.visualFocus ? root.accent : userPicker.hovered ? Theme.outline : "transparent" }
             // the list: a rounded panel, like the pills
             popup: Popup {
                 y: userPicker.height + 6
@@ -237,7 +234,7 @@ Rectangle {
                     model: userPicker.popup.visible ? userPicker.delegateModel : null
                     currentIndex: userPicker.highlightedIndex
                 }
-                background: Rectangle { radius: 16; color: "#0a0b0a"; border.width: 1; border.color: "#1f2421" }
+                background: Rectangle { radius: 16; color: Theme.panel; border.width: 1; border.color: Theme.outline }
             }
             delegate: ItemDelegate {
                 id: userItem
@@ -245,9 +242,9 @@ Rectangle {
                 required property int index
                 width: userPicker.width - 12
                 text: model.name
-                contentItem: Text { text: userItem.text; color: root.text; font: userPicker.font
+                contentItem: Text { text: userItem.text; color: Theme.text; font: userPicker.font
                                     horizontalAlignment: Text.AlignHCenter }
-                background: Rectangle { color: highlighted ? "#1f2421" : "#0a0b0a"; radius: 10 }
+                background: Rectangle { color: highlighted ? Theme.surfaceHover : Theme.panel; radius: 10 }
                 highlighted: userPicker.highlightedIndex === index
             }
         }
@@ -260,11 +257,11 @@ Rectangle {
             echoMode: TextInput.Password
             passwordCharacter: "●"
             horizontalAlignment: TextInput.AlignHCenter
-            color: root.text
+            color: Theme.text
             placeholderText: qsTr("Password")
             Accessible.name: qsTr("Password")
             Accessible.description: keyboard.capsLock ? qsTr("Caps Lock is on") : ""
-            placeholderTextColor: root.subtext
+            placeholderTextColor: Theme.subtext
             font { pixelSize: 18 }
             // dark surface inside a jade -> amber edge,
             // a little brighter while the field has focus
@@ -279,7 +276,7 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 1
                     radius: height / 2
-                    color: "#121513"
+                    color: Theme.surface
                 }
             }
             enabled: !root.launching
@@ -301,7 +298,7 @@ Rectangle {
             objectName: "capsWarning"
             visible: keyboard.capsLock
             text: qsTr("Caps Lock is on")
-            color: "#dfa33a"
+            color: Theme.amber
             font { pixelSize: 15 }
             Accessible.role: Accessible.AlertMessage
             Accessible.name: text
@@ -315,7 +312,7 @@ Rectangle {
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             text: root.message
-            color: root.text
+            color: Theme.text
             font { pixelSize: 15 }
             Accessible.role: Accessible.AlertMessage
             Accessible.name: text
@@ -338,16 +335,16 @@ Rectangle {
         contentItem: Text {
             leftPadding: 18
             text: sessionPicker.displayText
-            color: root.subtext
+            color: Theme.subtext
             font: sessionPicker.font
             verticalAlignment: Text.AlignVCenter
         }
         indicator: Text { x: sessionPicker.width - width - 16; anchors.verticalCenter: parent.verticalCenter
-                          text: "▾"; color: root.subtext; font.pixelSize: 14 }
+                          text: "▾"; color: Theme.subtext; font.pixelSize: 14 }
         // solid dark fill, like the power buttons
-        background: Rectangle { radius: height / 2; color: sessionPicker.hovered ? "#1f2421" : "#121513"
+        background: Rectangle { radius: height / 2; color: sessionPicker.hovered ? Theme.surfaceHover : Theme.surface
                                 border.width: sessionPicker.visualFocus ? 2 : 1
-                                border.color: sessionPicker.visualFocus ? root.accent : sessionPicker.hovered ? "#2a302d" : "#1f2421" }
+                                border.color: sessionPicker.visualFocus ? root.accent : sessionPicker.hovered ? Theme.outlineHover : Theme.outline }
         // the list: a rounded panel, like the pills
         popup: Popup {
             y: -implicitHeight - 6
@@ -361,7 +358,7 @@ Rectangle {
                 model: sessionPicker.popup.visible ? sessionPicker.delegateModel : null
                 currentIndex: sessionPicker.highlightedIndex
             }
-            background: Rectangle { radius: 16; color: "#0a0b0a"; border.width: 1; border.color: "#1f2421" }
+            background: Rectangle { radius: 16; color: Theme.panel; border.width: 1; border.color: Theme.outline }
         }
         delegate: ItemDelegate {
             id: sessionItem
@@ -370,8 +367,8 @@ Rectangle {
             objectName: "session-" + index
             width: sessionPicker.width - 12
             text: model.name
-            contentItem: Text { text: sessionItem.text; color: root.text; font: sessionPicker.font; leftPadding: 10 }
-            background: Rectangle { color: highlighted ? "#1f2421" : "#0a0b0a"; radius: 10 }
+            contentItem: Text { text: sessionItem.text; color: Theme.text; font: sessionPicker.font; leftPadding: 10 }
+            background: Rectangle { color: highlighted ? Theme.surfaceHover : Theme.panel; radius: 10 }
             highlighted: sessionPicker.highlightedIndex === index
         }
     }
@@ -402,16 +399,16 @@ Rectangle {
                 Keys.onEnterPressed: clicked()
                 Accessible.name: modelData.label
                 contentItem: Image { source: powerButton.modelData.icon; sourceSize: Qt.size(20, 20); fillMode: Image.Pad }
-                background: Rectangle { radius: 9; color: powerButton.hovered ? "#1f2421" : "#121513"
+                background: Rectangle { radius: 9; color: powerButton.hovered ? Theme.surfaceHover : Theme.surface
                                         border.width: powerButton.visualFocus ? 2 : 1
-                                        border.color: powerButton.visualFocus ? root.accent : powerButton.hovered ? "#2a302d" : "#1f2421" }
+                                        border.color: powerButton.visualFocus ? root.accent : powerButton.hovered ? Theme.outlineHover : Theme.outline }
                 ToolTip {
                     visible: powerButton.hovered || powerButton.visualFocus
                     delay: 400
                     y: -implicitHeight - 8
                     x: (powerButton.width - implicitWidth) / 2
-                    contentItem: Text { text: powerButton.modelData.label; color: root.text; font { pixelSize: 14 } }
-                    background: Rectangle { radius: 10; color: "#121513"; border.width: 1; border.color: "#2a302d" }
+                    contentItem: Text { text: powerButton.modelData.label; color: Theme.text; font { pixelSize: 14 } }
+                    background: Rectangle { radius: 10; color: Theme.surface; border.width: 1; border.color: Theme.outlineHover }
                     padding: 8; leftPadding: 12; rightPadding: 12
                 }
             }
@@ -424,7 +421,7 @@ Rectangle {
         id: keyboardPanel
         objectName: "keyboardPanel"
         active: root.keyboardWanted && root.primary
-        source: "VirtualKeyboard.qml"
+        source: "login/VirtualKeyboard.qml"
         anchors.fill: parent
         z: 20
         function toggle() {
