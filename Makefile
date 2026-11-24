@@ -4,7 +4,7 @@
 # Laser Cats
 #   make install      install the theme (PREFIX=/usr, DESTDIR for packaging)
 #   make uninstall
-#   make check        everything CI checks: lint, test, smoke, visual, translations
+#   make check        lint, test, smoke, visual, translations (CI adds `make greeter`)
 #   make dist         the release archive, laser-cats-sddm-VERSION.tar.gz
 #
 # Needs Qt 6 (qt6-declarative, qt6-imageformats, qt6-svg, qt6-tools) and
@@ -24,12 +24,16 @@ DIRS      := sky login style assets get-cats tools LICENSES
 QM        := $(patsubst %.ts,%.qm,$(wildcard translations/*.ts))
 LANGS     := $(basename $(notdir $(wildcard translations/*.ts)))
 
-.PHONY: all install uninstall translations check versions lint test smoke visual i18n dist clean
+.PHONY: all install uninstall translations update-translations check versions lint test smoke greeter visual i18n dist clean
 
 all: translations
 
 translations: $(QM)
 	@! grep -l 'type="unfinished"' translations/*.ts || { echo "unfinished translations above"; exit 1; }
+
+# after changing the text in login/: bring every .ts file up to date
+update-translations:
+	$(QTBIN)/lupdate -no-obsolete -locations none Main.qml login -ts $(wildcard translations/*.ts)
 
 translations/%.qm: translations/%.ts
 	$(QTBIN)/lrelease -silent $< -qm $@
@@ -52,10 +56,14 @@ versions:
 	@grep -q '^pkgver=$(VERSION)$$' packaging/arch/PKGBUILD || { echo "packaging/arch/PKGBUILD: pkgver is not $(VERSION)"; exit 1; }
 	@grep -q '^## \[$(VERSION)\]' CHANGELOG.md || { echo "CHANGELOG.md has no entry for $(VERSION)"; exit 1; }
 	@! grep -nE 'laser-cats-sddm-[0-9]+\.[0-9]+' README.md CONTRIBUTING.md docs/*.md || { echo "a version number is written out above"; exit 1; }
+	@[ "$$(grep -hoE 'archlinux:base-[0-9.]+' .github/workflows/*.yml | sort -u | wc -l)" = 1 ] \
+	  && [ "$$(grep -hoE '(snapshot|SNAPSHOT): [0-9/]+' .github/workflows/*.yml | cut -d' ' -f2 | sort -u | wc -l)" = 1 ] \
+	  || { echo "check.yml and release.yml pin different Arch images or snapshots"; exit 1; }
 	@echo "version $(VERSION) agrees everywhere"
 
 # VirtualKeyboard.qml needs qt6-virtualkeyboard; it's skipped if that isn't installed
-HAVE_VK   := $(wildcard /usr/lib/qt6/qml/QtQuick/VirtualKeyboard)
+QMLDIR    := $(or $(shell $(QTBIN)/qtpaths --query QT_INSTALL_QML 2>/dev/null),/usr/lib/qt6/qml)
+HAVE_VK   := $(wildcard $(QMLDIR)/QtQuick/VirtualKeyboard)
 QMLFILES  := Main.qml $(wildcard sky/*.qml login/*.qml style/*.qml ci/*.qml tests/*.qml)
 LINT      := $(if $(HAVE_VK),$(QMLFILES),$(filter-out login/VirtualKeyboard.qml,$(QMLFILES)))
 

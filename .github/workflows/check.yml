@@ -1,52 +1,65 @@
 # SPDX-FileCopyrightText: 2026 tom
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Checks on every push and pull request (the same as `make check`):
-#   qml      qmllint (no warnings), the Qt Quick Test suites, headless runs
-#            (normal, calm, software renderer, HiDPI, right-to-left), the
-#            screenshot comparisons, and every translation
-#   scripts  shellcheck, the Python tools compile, REUSE licence info
+# Checks on every pull request and on main:
+#   qml          everything `make check` does, and the theme loaded by the
+#                real SDDM greeter, on a pinned Qt (see qml.yml). To move to
+#                a newer Qt, change the image and snapshot here and in
+#                release.yml together (`make versions` checks they agree).
+#   minimum-qt   the tests and headless runs on Qt 6.8, the oldest Qt the
+#                theme supports (Debian 13)
+#   scripts      shellcheck, the Python tools compile, the workflows lint,
+#                REUSE licence info
 name: check
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   qml:
+    uses: ./.github/workflows/qml.yml
+    with:
+      image: archlinux:base-20261122.0.629543
+      snapshot: 2026/11/23
+
+  minimum-qt:
     runs-on: ubuntu-latest
-    # Arch, for a current Qt 6 (the theme uses Qt 6.5+ QML features)
-    container: archlinux:latest
+    container: debian:13
     steps:
-      - name: Install Qt 6 and tools
-        run: >
-          pacman -Syu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats
-          qt6-tools qt6-virtualkeyboard imagemagick mesa ttf-dejavu git make
-      - uses: actions/checkout@v4
-      - name: Lint
-        run: make lint
+      - name: Install Qt 6.8
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends make git ca-certificates fonts-dejavu-core \
+            qml-qt6 qt6-declarative-dev-tools qt6-base-dev-tools qt6-image-formats-plugins qt6-svg-plugins \
+            qml6-module-qtqml qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-controls \
+            qml6-module-qtquick-effects qml6-module-qtquick-shapes qml6-module-qtquick-particles \
+            qml6-module-qttest qml6-module-qtquick-virtualkeyboard
+          /usr/lib/qt6/bin/qtpaths --qt-version
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Unit tests
         run: make test
       - name: Headless runs
         run: make smoke
-      - name: Screenshot comparisons
-        run: OUTDIR=visual-out make visual
-      - name: Translations
-        run: make i18n
-      - name: Keep the pictures if they differ
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-differences
-          path: visual-out/
-          if-no-files-found: ignore
 
   scripts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: shellcheck
         run: shellcheck get-cats.sh ci/compare.sh
       - name: Python tools compile
-        run: python3 -m py_compile tools/*.py get-cats/*.py
+        run: python3 -m py_compile tools/*.py get-cats/*.py ci/*.py
+      - name: Workflows lint
+        uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color
       - name: REUSE licence information
         run: pipx run reuse lint

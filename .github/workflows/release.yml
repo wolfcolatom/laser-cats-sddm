@@ -17,11 +17,17 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    container: archlinux:latest
+    # the same pinned image and package snapshot as check.yml, so the archive
+    # can be rebuilt bit for bit
+    container: archlinux:base-20261122.0.629543
+    env:
+      SNAPSHOT: 2026/11/23
     steps:
       - name: Install tools
-        run: pacman -Syu --noconfirm --needed qt6-tools git make tar gzip github-cli
-      - uses: actions/checkout@v4
+        run: |
+          echo "Server = https://archive.archlinux.org/repos/$SNAPSHOT/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+          pacman -Syyuu --noconfirm --needed qt6-tools git make tar gzip github-cli
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check the tag matches the version
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -33,7 +39,7 @@ jobs:
           make dist
           sha256sum "laser-cats-sddm-$VERSION.tar.gz" > SHA256SUMS
           cat SHA256SUMS
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: laser-cats-sddm-${{ env.VERSION }}.tar.gz
       - name: Release notes from CHANGELOG.md

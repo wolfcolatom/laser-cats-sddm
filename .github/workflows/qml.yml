@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
+# The QML checks (the same as `make check`, plus the real SDDM greeter), on
+# an Arch image. Called by check.yml with a pinned image and package
+# snapshot, so a run only changes when the code does, and by canary.yml with
+# today's Arch, to hear about a new Qt before users do.
+name: qml
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: The Arch container image
+        type: string
+        required: true
+      snapshot:
+        description: Day of the Arch package archive to install from (YYYY/MM/DD); empty for today's packages
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  qml:
+    runs-on: ubuntu-latest
+    container: ${{ inputs.image }}
+    steps:
+      - name: Install Qt 6, SDDM and tools
+        env:
+          SNAPSHOT: ${{ inputs.snapshot }}
+        run: |
+          if [ -n "$SNAPSHOT" ]; then
+            echo "Server = https://archive.archlinux.org/repos/$SNAPSHOT/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+          fi
+          pacman -Syyuu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats \
+            qt6-tools qt6-virtualkeyboard sddm imagemagick mesa git make
+          pacman -Q qt6-base qt6-declarative sddm
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Versions agree
+        run: make versions
+      - name: Lint
+        run: make lint
+      - name: Unit tests
+        run: make test
+      - name: Headless runs
+        run: make smoke
+      - name: Under the real SDDM greeter
+        run: make greeter
+      - name: Screenshot comparisons
+        run: OUTDIR=visual-out make visual
+      - name: Translations
+        run: make i18n
+      - name: Keep the pictures if they differ
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: visual-differences
+          path: visual-out/
+          if-no-files-found: ignore

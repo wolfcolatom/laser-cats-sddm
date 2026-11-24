@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Once a week, the same checks on today's Arch (the newest Qt and SDDM), to
+# find out about a change in Qt before it reaches a login screen. A failure
+# here means: fix the theme, then move the pin in check.yml and release.yml.
+name: canary
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  latest-qt:
+    uses: ./.github/workflows/qml.yml
+    with:
+      image: archlinux:latest
