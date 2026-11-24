@@ -9,7 +9,8 @@ import "../login"
 Backend {
     id: fake
 
-    users: ListModel { ListElement { name: "user" } }
+    readonly property ListModel oneUser: ListModel { ListElement { name: "user" } }
+    users: oneUser
     sessions: ListModel {
         ListElement { name: "Plasma (Wayland)" }
         ListElement { name: "niri" }
@@ -46,6 +47,7 @@ Backend {
         accept = true; answers = true
         capsLock = false; primary = true
         canReboot = true; canPowerOff = true
+        users = oneUser
         lastUser = "user"; lastUserIndex = 0; lastSession = 0
         settings = { calm: "false" }
     }

@@ -8,6 +8,10 @@
         <translation>Utente</translation>
     </message>
     <message>
+        <source>Username</source>
+        <translation>Nome utente</translation>
+    </message>
+    <message>
         <source>Wrong password</source>
         <translation>Password errata</translation>
     </message>

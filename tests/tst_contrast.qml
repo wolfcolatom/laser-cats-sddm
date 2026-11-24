@@ -11,8 +11,7 @@ TestCase {
     name: "Contrast"
 
     function channel(c) { return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4) }
-    function luminance(hex) {
-        const c = Qt.color(hex)
+    function luminance(c: color): real {
         return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
     }
     function ratio(fg, bg) {
@@ -21,14 +20,15 @@ TestCase {
     }
     // [what, text colour, background, minimum]
     readonly property var pairs: [
-        ["password text on the field", Theme.white, "#121513", 4.5],
-        ["placeholder / names on the field", "#8a958e", "#121513", 4.5],
-        ["user name on the sky", "#8a958e", "#000000", 4.5],
-        ["Caps Lock warning", Theme.amber, "#000000", 4.5],
-        ["SDDM message", Theme.white, "#000000", 4.5],
-        ["session picker text", "#8a958e", "#1f2421", 4.5],
-        ["clock (large)", Theme.white, "#000000", 3],
-        ["date (large)", Theme.mint, "#000000", 3]
+        ["password text on the field", Theme.text, Theme.surface, 4.5],
+        ["placeholder / names on the field", Theme.subtext, Theme.surface, 4.5],
+        ["user name on the sky", Theme.subtext, Theme.backdrop, 4.5],
+        ["Caps Lock warning", Theme.amber, Theme.backdrop, 4.5],
+        ["SDDM message", Theme.text, Theme.backdrop, 4.5],
+        ["session picker text", Theme.subtext, Theme.surfaceHover, 4.5],
+        ["list entries", Theme.text, Theme.surfaceHover, 4.5],
+        ["clock (large)", Theme.white, Theme.backdrop, 3],
+        ["date (large)", Theme.mint, Theme.backdrop, 3]
     ]
     function test_contrast_data() { return pairs.map(p => ({ tag: p[0], fg: p[1], bg: p[2], min: p[3] })) }
     function test_contrast(d) {

@@ -146,7 +146,7 @@ Item {
     // a hit where one of the beams is landing: a fireball there, an impact,
     // and sometimes (`bite`: always) a piece chipped off
     property int nextImpact: 0
-    function hitBeam(colour, bite) {
+    function hitBeam(colour: color, bite: bool) {
         const b = lasers.itemAt(Math.floor(chance.next() * lasers.count)) as Beam
         if (!b) return
         const outward = Math.atan2(b.to.y - centre.y, b.to.x - centre.x)

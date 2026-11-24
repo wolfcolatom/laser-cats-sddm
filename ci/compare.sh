@@ -2,22 +2,24 @@
 # SPDX-FileCopyrightText: 2026 tom
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Visual regression: renders the frozen sky (ci/visual.qml) and compares
-# each picture with the approved one in ci/golden/. A picture may differ by
-# up to THRESHOLD (root-mean-square, 0-1) before it fails; differences are
+# each picture with the approved one in ci/golden/. The pictures are exactly
+# repeatable, so THRESHOLD (root-mean-square, 0-1) only allows for rounding:
+# one changed word on the screen is several times over it. Differences are
 # written to OUTDIR as *-diff.png. To approve new pictures after an
 # intended change:  ci/compare.sh --update
 # Needs: qml (Qt 6), ImageMagick 7.
 set -euo pipefail
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 out=${OUTDIR:-$(mktemp -d)}
-threshold=${THRESHOLD:-0.01}
+threshold=${THRESHOLD:-0.002}
+qtbin=${QTBIN:-/usr/lib/qt6/bin}
 mkdir -p "$out"
 
 # the same font, language and time zone everywhere: only the bundled Space
 # Grotesk (ci/fonts.conf), the C locale, UTC
 FONTCONFIG_FILE="$here/fonts.conf" LC_ALL=C.UTF-8 TZ=UTC \
 QT_QPA_PLATFORM=offscreen QT_FORCE_STDERR_LOGGING=1 \
-    timeout 180 /usr/lib/qt6/bin/qml "$here/visual.qml" -- "$out"
+    timeout 180 "$qtbin/qml" "$here/visual.qml" -- "$out"
 
 if [ "${1:-}" = "--update" ]; then
     for f in "$out"/*.png; do magick "$f" -strip "PNG24:$here/golden/$(basename "$f")"; done

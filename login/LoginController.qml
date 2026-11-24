@@ -34,9 +34,13 @@ QtObject {
 
     // false if it was ignored (already logging in, or nothing typed)
     function submit(password: string): bool {
-        if (busy || password === "") return false
+        if (busy || password === "" || user === "") return false
         message = ""
         rejected = false
+        // who and where are fixed now: a list changed while the explosion
+        // plays must not send this password as somebody else
+        pendingUser = user
+        pendingSession = session
         if (calm) {
             send(password)
         } else {
@@ -56,10 +60,12 @@ QtObject {
 
     // ---- internals
     property string pending: ""
+    property string pendingUser: ""
+    property int pendingSession: 0
     function send(password: string) {
         stage = LoginController.Stage.Waiting
         watchdog.start()
-        backend.login(user, password, session)
+        backend.login(pendingUser, password, pendingSession)
     }
     readonly property Timer watchdog: Timer {
         interval: controller.watchdogMs
@@ -71,7 +77,12 @@ QtObject {
     }
     readonly property Connections fromBackend: Connections {
         target: controller.backend
+        // accepted: the display manager closes the screen; nothing more to do
+        function onLoginSucceeded() { controller.watchdog.stop() }
         function onLoginFailed() {
+            // an answer after the wait was given up: the field is already
+            // back, and what has been typed since must not be thrown away
+            if (!controller.busy) return
             controller.watchdog.stop()
             controller.pending = ""
             controller.stage = LoginController.Stage.Idle

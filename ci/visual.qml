@@ -36,7 +36,8 @@ Window {
     readonly property var loginMoments: [
         ["login", () => {}],
         ["login-alerts", () => { fake.capsLock = true; fake.informationMessage("Your password expires in 3 days") }],
-        ["login-several-users", () => { fake.users = several; fake.lastUser = "grace"; fake.lastUserIndex = 1 }]
+        ["login-several-users", () => { fake.users = several; fake.lastUser = "grace"; fake.lastUserIndex = 1 }],
+        ["login-nobody-listed", () => { fake.users = nobody; fake.lastUser = "" }]
     ]
     property int step: -1
 
@@ -53,6 +54,7 @@ Window {
         ListElement { name: "ada" }
         ListElement { name: "grace" }
     }
+    ListModel { id: nobody }
     Component { id: loginScreen; LoginScreen { anchors.fill: parent; backend: fake } }
     property LoginScreen loginView: null
 

@@ -20,11 +20,18 @@ QtObject {
     readonly property bool keyboard: flag("keyboard")       // offer the on-screen keyboard
     readonly property string timeFormat: text("timeFormat") // "" = the system's
     readonly property string dateFormat: text("dateFormat")
-    readonly property color accent: text("accent") !== "" ? text("accent") : Theme.jade
+    readonly property color accent: colour("accent", Theme.jade)
 
     function text(key: string): string {
         const value = source ? source[key] : undefined
         return value === undefined || value === null ? "" : String(value).trim()
     }
     function flag(key: string): bool { return text(key).toLowerCase() === "true" }
+    // a colour by name or #hex; the fallback if it is missing or not a colour
+    // (a typo must not turn the focus ring black)
+    function colour(key: string, fallback: color): color {
+        const name = text(key)
+        if (name === "") return fallback
+        try { return Qt.color(name) } catch (e) { return fallback }
+    }
 }

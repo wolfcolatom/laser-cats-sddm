@@ -34,7 +34,7 @@ jobs:
             echo "Server = https://archive.archlinux.org/repos/$SNAPSHOT/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
           fi
           pacman -Syyuu --noconfirm --needed qt6-declarative qt6-svg qt6-imageformats \
-            qt6-tools qt6-virtualkeyboard sddm imagemagick mesa git make
+            qt6-tools qt6-virtualkeyboard sddm imagemagick mesa xorg-server-xvfb git make
           pacman -Q qt6-base qt6-declarative sddm
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Versions agree
@@ -45,12 +45,19 @@ jobs:
         run: make test
       - name: Headless runs
         run: make smoke
+      - name: Drawn with OpenGL
+        run: make smoke-gl
       - name: Under the real SDDM greeter
         run: make greeter
       - name: Screenshot comparisons
         run: OUTDIR=visual-out make visual
       - name: Translations
         run: make i18n
+      - name: The compiled translations in git are current
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          make -B translations
+          git diff --exit-code -- translations
       - name: Keep the pictures if they differ
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

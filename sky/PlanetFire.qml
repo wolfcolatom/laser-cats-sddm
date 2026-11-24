@@ -19,7 +19,7 @@ Item {
     required property Repeater beams    // the lasers (Beam), for where they land
 
     // a hit at (px, py), flying off the surface in direction `outward` (radians)
-    function impact(px, py, outward) {
+    function impact(px: real, py: real, outward: real) {
         impactAngle = outward * 180 / Math.PI
         impactBall.burst(18, px, py)
         impactCore.burst(6, px, py)
@@ -27,7 +27,7 @@ Item {
         impactDebris.burst(12, px, py)
     }
     // n chips of rock knocked off at (px, py), after impact() set the direction
-    function chips(n, px, py) { impactChip.burst(n, px, py) }
+    function chips(n: int, px: real, py: real) { impactChip.burst(n, px, py) }
     // the planet exploding: a fireball, smoke and embers
     function blast() { blastFire.burst(320); blastSmoke.burst(28); blastEmbers.burst(90) }
 

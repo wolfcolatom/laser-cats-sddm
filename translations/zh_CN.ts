@@ -8,6 +8,10 @@
         <translation>用户</translation>
     </message>
     <message>
+        <source>Username</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
         <source>Wrong password</source>
         <translation>密码错误</translation>
     </message>

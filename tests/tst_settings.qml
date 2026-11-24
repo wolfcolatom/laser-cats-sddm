@@ -53,4 +53,17 @@ TestCase {
         compare(settings.dateFormat, "d MMMM")
         verify(Qt.colorEqual(settings.accent, "#ff0000"))
     }
+    function test_accent_data() {
+        return [
+            { tag: "hex", value: "#ff0000", expect: "#ff0000" },
+            { tag: "a name", value: "teal", expect: "#008080" },
+            { tag: "not set", value: "", expect: Theme.jade },
+            { tag: "a typo", value: "#43af9", expect: Theme.jade },
+            { tag: "nonsense", value: "jadeish", expect: Theme.jade }
+        ]
+    }
+    function test_accent(d) {
+        settings.source = { accent: d.value }
+        verify(Qt.colorEqual(settings.accent, d.expect), d.tag + " gave " + settings.accent)
+    }
 }

@@ -20,6 +20,7 @@ Item {
         ListElement { name: "grace" }
     }
     Component { id: oneUser; ListModel { ListElement { name: "user" } } }
+    ListModel { id: nobody }
     Component {
         id: screenComponent
         LoginScreen { anchors.fill: parent; backend: fake }
@@ -160,6 +161,44 @@ Item {
             submit("meow")
             compare(fake.logins[0].user, "ada")
         }
+        function test_listsLockWhileLoggingIn() {
+            fake.users = twoUsers
+            load()
+            submit("meow")                      // (the explosion is playing)
+            verify(!part("userPicker").enabled)
+            verify(!part("sessionPicker").enabled)
+        }
+        function test_nobodyListedAsksForAName() {
+            fake.users = nobody; fake.lastUser = ""
+            load({ calm: "true" })
+            const name = part("username")
+            verify(name.visible)
+            verify(!part("userPicker").visible)
+            verify(name.activeFocus, "the name comes first")
+            for (const c of " ada ") keyClick(c)
+            keyClick(Qt.Key_Return)
+            verify(field().activeFocus, "Enter moves on to the password")
+            for (const c of "meow") keyClick(c)
+            keyClick(Qt.Key_Return)
+            compare(fake.logins, [{ user: "ada", password: "meow", session: 0 }])
+        }
+        function test_lastTypedNameIsFilledIn() {
+            fake.users = nobody; fake.lastUser = "grace"
+            load({ calm: "true" })
+            compare(part("username").text, "grace")
+            verify(field().activeFocus, "straight to the password")
+        }
+        function test_noNameNoLogin() {
+            fake.users = nobody; fake.lastUser = ""
+            load({ calm: "true" })
+            submit("meow")
+            compare(fake.logins.length, 0)
+            compare(field().text, "meow", "what was typed is kept")
+            verify(part("username").activeFocus, "and the name is asked for")
+        }
+        function test_nameFieldOnlyWhenNobodyIsListed() {
+            verify(!part("username").visible)
+        }
         function test_listsShowNames() {
             const picker = part("sessionPicker")
             compare(picker.displayText, "Plasma (Wayland)")
@@ -187,6 +226,23 @@ Item {
             compare(message.text, "Your password expires in 3 days")
             type("x")
             verify(!message.visible, "cleared once you type")
+        }
+        function test_fieldStaysCentredUnderALongMessage() {
+            const centre = () => field().mapToItem(screen, field().width / 2, 0).x
+            compare(centre(), screen.width / 2)
+            fake.informationMessage("Your account has been locked after too many attempts; ask an administrator to unlock it")
+            verify(part("message").width > field().width, "the message is wider than the field")
+            wait(100)                           // (the column lays itself out on the next frame)
+            compare(centre(), screen.width / 2)
+        }
+        function test_shakeLeavesTheFieldInPlace() {
+            const x = field().x
+            fake.accept = false
+            load({ calm: "true" })
+            submit("nope")
+            tryVerify(() => field().placeholderText === "Wrong password")
+            wait(250)                           // (the shake is 150 ms)
+            compare(field().x, x)
         }
         function test_escapeClearsTheField() {
             type("ab")

@@ -65,7 +65,9 @@ explosion and warp have to play first. `LoginController` holds that order:
       ▲                                                  │
       └──────────── wrong password, or no answer ────────┘
 
-`submit()` asks the screen for the explosion; the sky says when the warp
+`submit()` notes who is logging in and to which session, so nothing
+changed while the explosion plays can alter it, and asks the screen for the
+explosion; the sky says when the warp
 has ended (`Sky.warpFinished`), and only then does the password go to the
 backend. A wrong password, or no answer within 15 seconds, puts it back to
 Idle and the screen rewinds the sky. In calm mode (or without a GPU, with
@@ -93,9 +95,15 @@ the primary screen; only that one shows the login controls.
 | | |
 |---|---|
 | `tests/` | Qt Quick Test: the controller, the settings, the whole screen driven by keys against the fake backend, the cat data, colour contrast, the random numbers |
-| `ci/visual.qml` | six reference pictures (sky idle, explosion, warp; three login screens), compared pixel by pixel |
+| `ci/visual.qml` | seven reference pictures (sky idle, explosion, warp; four login screens), compared pixel by pixel |
 | `ci/smoke.qml` | the real `Main.qml`, headless: normal, calm, software-rendered, HiDPI, right-to-left, on-screen keyboard |
+| `make smoke-gl` | the same run drawn with OpenGL on a virtual display, as on a real login screen |
 | `make greeter` | the theme loaded by the real `sddm-greeter-qt6` |
+
+The headless checks draw with Qt's software renderer, which leaves out the
+glows, so the reference pictures show the layout and the sky but not those
+effects; `make smoke-gl` runs the OpenGL path for errors, and how it looks
+on a GPU is still judged by eye (`ci/perf.qml` shows it full screen).
 
 CI runs all of it on a pinned Qt, the tests again on the oldest supported
 Qt, and once a week on the newest (see `.github/workflows/`).

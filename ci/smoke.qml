@@ -5,7 +5,7 @@
 // types a password, presses Enter and waits for the login to go through.
 // Exits 0 if the theme loaded and SDDM was asked to log in, 1 otherwise.
 // QML errors are caught by the workflow from the log.
-//   QT_QPA_PLATFORM=offscreen qml ci/smoke.qml [-- calm | keyboard]
+//   QT_QPA_PLATFORM=offscreen qml ci/smoke.qml [-- calm | keyboard | gl]
 import QtQuick
 import QtQuick.Window
 import QtTest
@@ -18,17 +18,18 @@ Window {
 
     readonly property bool calmMode: Qt.application.arguments.indexOf("calm") >= 0
     readonly property bool keyboardMode: Qt.application.arguments.indexOf("keyboard") >= 0
+    // gl: the run must be drawn with a GPU API (see `make smoke-gl`), as on a real login screen
+    readonly property bool glMode: Qt.application.arguments.indexOf("gl") >= 0
 
     // what SDDM gives a theme
     QtObject { id: config; property string accent: "#43af9c"; property string calm: win.calmMode ? "true" : "false"
                            property string keyboard: win.keyboardMode ? "true" : "false" }
     QtObject { id: keyboard; property bool capsLock: false }
-    QtObject {
+    ListModel {
         id: userModel
         property string lastUser: "user"
         property int lastIndex: 0
-        function index(r, c) { return r }
-        function data(i, role) { return "user" }
+        ListElement { name: "user" }
     }
     ListModel {
         id: sessionModel
@@ -66,7 +67,9 @@ Window {
         interval: 4000          // the explosion and warp take 2.2 s before the login
         onTriggered: {
             if (sddm.logins !== 1) { console.error("smoke: login was not sent (" + sddm.logins + ")"); Qt.exit(1); return }
-            console.log("smoke: ok" + (win.calmMode ? " (calm)" : ""))
+            const software = theme.GraphicsInfo.api === GraphicsInfo.Software
+            if (win.glMode && software) { console.error("smoke: drawn by the software renderer, not a GPU API"); Qt.exit(1); return }
+            console.log("smoke: ok" + (win.calmMode ? " (calm)" : "") + (software ? "" : " (drawn with a GPU API)"))
             Qt.exit(0)
         }
     }

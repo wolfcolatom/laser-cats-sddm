@@ -42,6 +42,9 @@ starfield and nebula scale up to fill the screen and the cats and planets
 scale with its height. On several screens the sky shows on all of them and
 the login controls on the primary one.
 
+With one account the screen shows its name; with several, a list; and if
+SDDM lists none (network accounts, hidden users), a field to type it.
+
 ## Changes
 
 See [CHANGELOG.md](CHANGELOG.md).

@@ -12,4 +12,7 @@ After changing the text in the theme, `make update-translations` brings
 every `.ts` file up to date; `make translations` fails while any entry is
 still unfinished.
 
-SDDM loads `<locale>.qm` from this folder (set in metadata.desktop).
+SDDM loads `<locale>.qm` from this folder (set in metadata.desktop). The
+compiled `.qm` files are kept in git on purpose: the theme can be installed
+by cloning the repository straight into SDDM's themes folder, with no build
+step. CI rebuilds them and fails if they differ from their `.ts`.

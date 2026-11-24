@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 tom
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Pushing a tag like v1.6 builds the release archive, its checksums and a
+# Pushing a tag like v1.6 runs the checks, then builds the release archive, its checksums and a
 # build-provenance attestation, and publishes the GitHub release with that
 # version's notes from CHANGELOG.md.
 name: release
@@ -15,7 +15,16 @@ permissions:
   attestations: write
 
 jobs:
+  check:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/qml.yml
+    with:
+      image: archlinux:base-20261122.0.629543
+      snapshot: 2026/11/23
+
   release:
+    needs: check
     runs-on: ubuntu-latest
     # the same pinned image and package snapshot as check.yml, so the archive
     # can be rebuilt bit for bit

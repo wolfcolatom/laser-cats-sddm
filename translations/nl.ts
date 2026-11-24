@@ -8,6 +8,10 @@
         <translation>Gebruiker</translation>
     </message>
     <message>
+        <source>Username</source>
+        <translation>Gebruikersnaam</translation>
+    </message>
+    <message>
         <source>Wrong password</source>
         <translation>Onjuist wachtwoord</translation>
     </message>

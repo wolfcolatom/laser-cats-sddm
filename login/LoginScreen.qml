@@ -28,13 +28,17 @@ Rectangle {
     // SDDM shows the theme on every screen; the controls go on the primary one
     readonly property bool primary: backend.primary
 
+    // who is logging in: picked from the display manager's list, or typed
+    // if it lists nobody (network accounts, hidden users)
+    readonly property bool typedUser: userPicker.count === 0
+
     LoginController {
         id: login
         objectName: "login"
         backend: screen.backend
         calm: screen.calm
-        user: screen.backend.lastUser   // (the user list below picks the first one if nobody has logged in yet)
-        session: screen.backend.lastSession
+        user: screen.typedUser ? username.text.trim() : userPicker.currentText
+        session: sessionPicker.currentIndex
         onExplosionRequested: sky.warpOut()
         onFailed: screen.askAgain(true)
         onTimedOut: screen.askAgain(false)
@@ -98,9 +102,9 @@ Rectangle {
             spacing: 14
 
             // who's logging in: with one account just the name; with several, a
-            // list to pick from
+            // list to pick from; with none listed, a field to type it
             Text {
-                visible: userPicker.count <= 1
+                visible: userPicker.count === 1
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: Theme.subtext
                 font { pixelSize: 18; weight: Font.DemiBold }
@@ -117,19 +121,38 @@ Rectangle {
                 currentIndex: Math.max(0, screen.backend.lastUserIndex)
                 width: Math.max(160, labelWidth + 64); height: 34
                 font { pixelSize: 18; weight: Font.DemiBold }
-                Component.onCompleted: if (currentText !== "") login.user = currentText
-                onActivated: { login.user = currentText; password.text = ""; password.forceActiveFocus() }
+                enabled: !login.busy
+                onActivated: { password.text = ""; password.forceActiveFocus() }
+            }
+            PillField {
+                id: username
+                objectName: "username"
+                visible: screen.typedUser
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: 46
+                enabled: !login.busy
+                accent: settings.accent
+                text: screen.backend.lastUser
+                placeholderText: qsTr("Username")
+                Accessible.name: qsTr("Username")
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+                onAccepted: password.forceActiveFocus()
             }
             PasswordField {
                 id: password
                 objectName: "password"
+                anchors.horizontalCenter: parent.horizontalCenter
                 focus: true
                 enabled: !login.busy
                 accent: settings.accent
                 capsLock: screen.backend.capsLock
                 placeholderText: login.rejected ? qsTr("Wrong password") : qsTr("Password")
                 // the field is emptied at once: the password lives on only in the controller
-                onAccepted: { const typed = text; if (login.submit(typed)) text = "" }
+                onAccepted: {
+                    const typed = text
+                    if (login.submit(typed)) text = ""
+                    else if (screen.typedUser && login.user === "") username.forceActiveFocus()
+                }
                 onTextChanged: if (text !== "") login.clearMessage()
                 onKeyTyped: sky.keyPressed()
             }
@@ -183,8 +206,8 @@ Rectangle {
             width: 220; height: 40
             opensUp: true; accent: settings.accent
             model: screen.backend.sessions
-            currentIndex: login.session
-            onActivated: login.session = currentIndex
+            currentIndex: Math.max(0, screen.backend.lastSession)
+            enabled: !login.busy
             font.pixelSize: 15
         }
         // bottom-right: on-screen keyboard, restart, shut down
@@ -214,5 +237,9 @@ Rectangle {
     }
     Binding { target: screen.keyboardItem; property: "shown"; value: screen.keyboardShown; when: screen.keyboardItem !== null }
 
-    Component.onCompleted: if (primary) password.forceActiveFocus()
+    Component.onCompleted: {
+        if (!primary) return
+        if (typedUser && username.text === "") username.forceActiveFocus()
+        else password.forceActiveFocus()
+    }
 }

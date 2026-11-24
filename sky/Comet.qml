@@ -15,7 +15,6 @@ Item {
     Rng { id: rng; seed: comet.seed }
     required property real areaWidth    // the sky it crosses
     required property real areaHeight
-    function show() { cometTimer.triggered() }     // (for testing)
     visible: running
     width: 460; height: 14
     opacity: 0

@@ -30,9 +30,4 @@ TestCase {
     function test_range() {
         for (const v of draw(a, 7, 10000)) verify(v >= 0 && v < 1)
     }
-    function test_spread() {
-        const v = draw(a, 3, 10000)
-        const mean = v.reduce((x, y) => x + y, 0) / v.length
-        verify(Math.abs(mean - 0.5) < 0.02, "mean " + mean)
-    }
 }

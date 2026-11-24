@@ -29,6 +29,18 @@ Nothing looks different; this release is about how the theme is built.
   (`--force` overrides).
 
 ### Fixed
+- If SDDM lists no users (network accounts, hidden users) there was no way
+  to say who you are. A username field now appears in that case.
+- Changing the user or session list while the explosion played could send
+  the password under another name. Who and where are fixed when Enter is
+  pressed, and the lists lock until SDDM answers.
+- An answer from SDDM arriving after the theme had stopped waiting wiped
+  what had been typed since.
+- A message wider than the password field pushed the field off-centre.
+- A mistyped `accent` colour turned the focus rings black; it now falls
+  back to jade.
+- The drop-down arrow was a character some fonts don't have; it is drawn.
+- `make install` no longer copies Python cache folders.
 - The on-screen keyboard filled the whole screen, slid in at start-up, and
   once up covered its own button and could cover the password field. It
   now slides up only when asked, and the controls move clear of it.
@@ -38,9 +50,11 @@ Nothing looks different; this release is about how the theme is built.
 - Tests for the controller, the settings and the on-screen keyboard, and
   reference pictures of the login screen itself (plain, with warnings,
   with several users).
-- `make greeter`: the theme loaded by the real SDDM greeter, also in CI.
+- `make greeter`: the theme loaded by the real SDDM greeter, and
+  `make smoke-gl`: a run drawn with OpenGL; both also in CI.
 - CI runs on a pinned Qt, again on Qt 6.8, and weekly on the newest; the
-  release is built from the same pinned packages.
+  release is built from the same pinned packages, and only after the
+  checks pass on its tag.
 - `make update-translations`.
 
 ### Removed

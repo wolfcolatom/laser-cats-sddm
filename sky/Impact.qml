@@ -16,12 +16,12 @@ Item {
     property real p: 1                      // 0 -> 1 over the burst
     property color colour: Theme.amber
     property real outward: 0                // direction off the surface (radians)
-    property var dirs: []                   // each spark's direction and reach
-    property var reach: []
+    property list<real> dirs                // each spark's direction and reach
+    property list<real> reach
     readonly property int durationMs: 520
 
     // at (px, py), in `c`, flying off the surface in direction `out` (radians)
-    function go(px, py, c, out) {
+    function go(px: real, py: real, c: color, out: real) {
         x = px; y = py; colour = c; outward = out
         let n = 8 + Math.floor(rng.next() * 3), ds = [], rs = []
         for (let k = 0; k < n; k++) {

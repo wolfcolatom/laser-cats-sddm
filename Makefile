@@ -24,7 +24,7 @@ DIRS      := sky login style assets get-cats tools LICENSES
 QM        := $(patsubst %.ts,%.qm,$(wildcard translations/*.ts))
 LANGS     := $(basename $(notdir $(wildcard translations/*.ts)))
 
-.PHONY: all install uninstall translations update-translations check versions lint test smoke greeter visual i18n dist clean
+.PHONY: all install uninstall translations update-translations check versions lint test smoke smoke-gl greeter visual i18n dist clean
 
 all: translations
 
@@ -43,6 +43,7 @@ install: translations
 	install -m 644 $(FILES) $(THEMEDIR)/
 	chmod 755 $(THEMEDIR)/get-cats.sh
 	cp -r $(DIRS) $(THEMEDIR)/
+	find $(THEMEDIR) -name __pycache__ -prune -exec rm -rf {} +
 	install -m 644 $(QM) translations/README.md $(THEMEDIR)/translations/
 
 uninstall:
@@ -94,6 +95,16 @@ smoke:
 	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' smoke.log,@echo "(qt6-virtualkeyboard not installed: on-screen keyboard not run)")
 	@rm -f smoke.log
 
+# The same run drawn with OpenGL, as on a real login screen (the headless
+# runs above use Qt's software renderer, which can't draw the glows): Mesa's
+# software GL on a virtual display. Not part of `check`: it needs xvfb-run.
+smoke-gl:
+	@LIBGL_ALWAYS_SOFTWARE=1 QT_QPA_PLATFORM=xcb QT_FORCE_STDERR_LOGGING=1 xvfb-run -a -s "-screen 0 1280x720x24" \
+	  timeout 120 $(QTBIN)/qml ci/smoke.qml -- gl > smoke.log 2>&1; s=$$?; cat smoke.log; \
+	  [ $$s = 0 ] && ! grep -E '\.qml:[0-9]+' smoke.log
+	@rm -f smoke.log
+	@echo "smoke-gl: drawn with OpenGL, no warnings"
+
 # the real SDDM greeter, headless, for a few seconds: it must load Main.qml
 # and stay up (so it ends by the timeout, exit 124) with no QML warnings.
 # Not part of `check`: it needs SDDM installed.
@@ -105,7 +116,7 @@ greeter:
 	@rm -f greeter.log; echo "greeter: loaded under the real SDDM greeter, no warnings"
 
 visual:
-	ci/compare.sh
+	QTBIN=$(QTBIN) ci/compare.sh
 
 # every translation shows up on the login screen
 i18n: translations

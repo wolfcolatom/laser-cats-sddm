@@ -8,6 +8,10 @@
         <translation>ユーザー</translation>
     </message>
     <message>
+        <source>Username</source>
+        <translation>ユーザー名</translation>
+    </message>
+    <message>
         <source>Wrong password</source>
         <translation>パスワードが違います</translation>
     </message>

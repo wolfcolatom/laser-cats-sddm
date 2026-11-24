@@ -19,8 +19,9 @@ TestCase {
     function init() {
         fake.reset()
         login.calm = false; login.watchdogMs = 15000
+        login.user = "user"; login.session = 1
         // back to Idle whatever the last test left behind
-        login.watchdog.stop(); login.pending = ""; login.stage = LoginController.Stage.Idle
+        login.watchdog.stop(); login.pending = ""; login.pendingUser = ""; login.stage = LoginController.Stage.Idle
         login.rejected = false; login.message = ""
         explosions.clear(); failures.clear(); timeouts.clear()
     }
@@ -91,6 +92,36 @@ TestCase {
         compare(login.pending, "")
         login.explosionFinished()
         compare(fake.logins.length, 0, "a late explosion sends nothing")
+    }
+    function test_nobodyToLogInIsIgnored() {
+        login.user = ""
+        verify(!login.submit("meow"))
+        compare(explosions.count, 0)
+    }
+    function test_whoAndWhereAreFixedAtSubmit() {
+        login.submit("meow")
+        login.user = "somebody-else"; login.session = 0      // a list changed while the explosion plays
+        login.explosionFinished()
+        compare(fake.logins, [{ user: "user", password: "meow", session: 1 }])
+    }
+    function test_lateFailureAfterGivingUpIsIgnored() {
+        fake.answers = false
+        login.watchdogMs = 100
+        login.calm = true
+        login.submit("meow")
+        tryCompare(timeouts, "count", 1)
+        fake.loginFailed()                                    // the answer turns up after all
+        compare(failures.count, 0)
+        verify(!login.rejected)
+        compare(login.stage, LoginController.Stage.Idle)
+    }
+    function test_rightPasswordStopsTheWait() {
+        login.watchdogMs = 150
+        login.calm = true
+        login.submit("meow")                                  // (the fake accepts after 50 ms)
+        wait(400)
+        compare(timeouts.count, 0, "no time-out after a yes")
+        compare(login.stage, LoginController.Stage.Waiting)
     }
     function test_messages() {
         fake.informationMessage("Your password expires in 3 days")

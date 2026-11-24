@@ -24,8 +24,10 @@ on-screen keyboard, `qt6-virtualkeyboard`. On Arch:
 | `make translations` | compiles `translations/*.ts` and checks none are unfinished |
 | `make i18n` | every translation shows up on the login screen |
 
-`make greeter` (not part of `check`: it needs SDDM installed) loads the
-theme under the real `sddm-greeter-qt6` and fails on any warning. To look
+Two more that CI runs but `check` doesn't, because they need more
+installed: `make greeter` (SDDM) loads the theme under the real
+`sddm-greeter-qt6`, and `make smoke-gl` (`xorg-server-xvfb`) runs it drawn
+with OpenGL; both fail on any warning. To look
 at it as a real login screen in a window (it can't log anyone in):
 
     sddm-greeter-qt6 --test-mode --theme .

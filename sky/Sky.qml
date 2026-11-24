@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 tom
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Laser Cats sky (used by Main.qml): a drifting starfield and nebula,
+// Laser Cats sky (used by login/LoginScreen.qml): a drifting starfield and nebula,
 // floating laser cats, two cats bursting out of burning planets, shooting
 // stars, and the explosion and warp played when you log in.
 pragma ComponentBehavior: Bound
@@ -45,11 +45,11 @@ Item {
     // reactions (called by the login screen):
     //   keyPressed()    the cats and lasers flash a little brighter; every
     //                   2nd key chips a piece off each planet
-    //   wrongPassword() they wash amber for a moment (amber = needs attention)
     //   warpOut()       the planets blow up (1.3 s), then warp speed: star
     //                   streaks rush out from the centre (0.9 s)
     //   rewind()        the login screen blows up before it knows the password
-    //                   is right; if it was wrong, everything flies back
+    //                   is right; if it was wrong, everything flies back,
+    //                   washed amber for a moment (amber = needs attention)
     //                   together, washed amber
     property real flash: 0
     property real alarm: 0
@@ -62,11 +62,9 @@ Item {
         keyCount++
         if (keyCount % 2 === 0) { planetLeft.keyChip(); planetRight.keyChip() }
     }
-    function wrongPassword() { alarmAnim.restart() }
     function warpOut() { rewindAnim.stop(); warpAnim.restart() }
     signal warpFinished()           // the explosion and warp have played right through
     function rewind() { warpAnim.stop(); rewindAnim.restart(); alarmAnim.restart() }
-    function showComet() { comet.show() }     // (for testing)
     NumberAnimation { id: flashAnim; target: root; property: "flash"; from: 1; to: 0; duration: 380; easing.type: Easing.OutQuad }
     SequentialAnimation {
         id: alarmAnim

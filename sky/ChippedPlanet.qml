@@ -25,7 +25,7 @@ Canvas {
 
     // a bite where a laser hits at (px, py) in the parent, `outward` (radians)
     // pointing off the surface; later bites dig deeper
-    function addBite(px, py, outward) {
+    function addBite(px: real, py: real, outward: real) {
         let open = 0
         for (let b = 0; b < bites.length; b++) if (!bites[b].healing) open++
         if (open >= maxBites) {

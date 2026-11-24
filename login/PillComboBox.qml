@@ -5,6 +5,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
+import QtQuick.Shapes
 import "../style"
 
 ComboBox {
@@ -25,9 +26,17 @@ ComboBox {
         horizontalAlignment: picker.centred ? Text.AlignHCenter : Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
     }
-    indicator: Text {
-        x: picker.width - width - 16; anchors.verticalCenter: parent.verticalCenter
-        text: "▾"; color: Theme.subtext; font.pixelSize: 14
+    // the arrow, drawn (a "▾" character depends on the font having one)
+    indicator: Shape {
+        x: picker.width - width - 18; y: (picker.height - height) / 2 + 1
+        width: 9; height: 5
+        ShapePath {
+            strokeColor: "transparent"; fillColor: Theme.subtext
+            startX: 0; startY: 0
+            PathLine { x: 9; y: 0 }
+            PathLine { x: 4.5; y: 5 }
+            PathLine { x: 0; y: 0 }
+        }
     }
     background: Rectangle {
         radius: height / 2
