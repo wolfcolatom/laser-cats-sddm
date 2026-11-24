@@ -25,7 +25,7 @@ them by itself. See "Classic cats" below.
 ## Requirements
 
 - **SDDM 0.21 or newer with the Qt 6 greeter** (`sddm-greeter-qt6`)
-- **Qt 6.5 or newer**: Quick with Effects, Shapes and Particles (Arch:
+- **Qt 6.8 or newer** (tested on 6.8 and the current release): Quick with Effects, Shapes and Particles (Arch:
   `qt6-declarative`), SVG (`qt6-svg`) and image formats for the animated
   WebP cats (Arch: `qt6-imageformats`, Debian/Ubuntu:
   `qt6-image-formats-plugins`, Fedora: `qt6-qtimageformats`). Plasma
@@ -73,7 +73,7 @@ Or from a release archive
 ([releases](https://github.com/wolfcolatom/laser-cats-sddm/releases)):
 
 ```
-tar -xzf laser-cats-sddm-1.5.tar.gz
+tar -xzf laser-cats-sddm-*.tar.gz
 sudo cp -r laser-cats /usr/share/sddm/themes/
 printf '[Theme]\nCurrent=laser-cats\n' | sudo tee /etc/sddm.conf.d/laser-cats.conf
 ```

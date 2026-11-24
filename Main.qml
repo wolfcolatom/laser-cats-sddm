@@ -55,7 +55,6 @@ Rectangle {
     // goes to SDDM. It is never logged.
     property bool launching: false
     property string pending: ""
-    readonly property int explosionMs: 2200     // the blast (1.3 s) and the warp (0.9 s)
     property int watchdogMs: 15000              // how long to wait for SDDM to answer
     function launch(text) {
         if (launching || text === "") return
@@ -64,13 +63,16 @@ Rectangle {
         password.text = ""
         if (gentle) { sddm.login(user, text, session); loginWatchdog.start(); return }
         pending = text
-        sky.warpOut()
-        loginTimer.start()
+        sky.warpOut()               // ...and onWarpFinished sends it
     }
-    Timer {
-        id: loginTimer
-        interval: root.explosionMs
-        onTriggered: { sddm.login(root.user, root.pending, root.session); root.pending = ""; loginWatchdog.start() }
+    Connections {
+        target: sky
+        function onWarpFinished() {
+            if (root.pending === "") return
+            sddm.login(root.user, root.pending, root.session)
+            root.pending = ""
+            loginWatchdog.start()
+        }
     }
     // never leave the field disabled: if SDDM hasn't answered, start over
     Timer {
@@ -100,7 +102,6 @@ Rectangle {
         objectName: "sky"
         anchors.fill: parent
         visible: root.lasers
-        jadeNebula: true
         calm: root.gentle
         frozen: root.stillSky
         // the classic GIF cats, once get-cats.sh has made them (it sets classic=true)

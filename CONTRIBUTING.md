@@ -5,7 +5,7 @@ anything bigger than a small fix, so we can agree on it.
 
 ## What you need
 
-Qt 6.5 or newer with Qt Quick (`qt6-declarative`), `qt6-imageformats`,
+Qt 6.8 or newer with Qt Quick (`qt6-declarative`), `qt6-imageformats`,
 `qt6-svg`, Qt's translation tools (`qt6-tools`), ImageMagick 7 and, for the
 on-screen keyboard, `qt6-virtualkeyboard`. On Arch:
 

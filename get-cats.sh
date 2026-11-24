@@ -24,12 +24,22 @@
 #   /usr/share/sddm/themes/laser-cats). If that folder belongs to root, the
 #   cats are made as you and only the final copy asks for sudo.
 #   bash get-cats.sh --remove [THEME_DIR]   takes the cats out again.
+#   bash get-cats.sh --force [THEME_DIR]    carries on even if a GIF isn't the
+#                                           exact file the cut-outs were made for
 #   It switches the theme over by setting classic=true (or false) in the
 #   theme's theme.conf.user, SDDM's place for local settings.
 set -euo pipefail
 
-remove=0
-if [ "${1:-}" = "--remove" ]; then remove=1; shift; fi
+remove=0; force=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --remove) remove=1; shift ;;
+        --force) force=1; shift ;;
+        --) shift; break ;;
+        -*) echo "Unknown option: $1" >&2; exit 2 ;;
+        *) break ;;
+    esac
+done
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 theme=$(cd "${1:-$here}" && pwd)
 [ -f "$theme/Sky.qml" ] && [ -d "$theme/assets" ] || { echo "Not a Laser Cats theme folder: $theme" >&2; exit 1; }
@@ -73,22 +83,30 @@ work=$(mktemp -d "${TMPDIR:-/tmp}/laser-cats.XXXXXX")
 trap 'rm -rf -- "$work"' EXIT
 mkdir "$work/out"
 
-# GIPHY id, file name, and the checksum of the GIF the theme was made from
-# (if GIPHY ever changes a file, the cut-outs could land in the wrong place)
+# GIPHY id, file name, and the SHA-256 of the GIF the cut-outs were made for
+# (a different file could put them in the wrong place, so it stops unless
+# --force is given)
 GIFS=(
-    "ArAgo5dU2z2xO major-lazer-cat.gif b3a53761cbdb"
-    "y9hjvnO2bwJbO city-cat.gif 077e4d0de9ae"
-    "l4FGoTd3NjBCmnZyE psychedelic-cat-dreams.gif 8da45a9a5d62"
+    "ArAgo5dU2z2xO major-lazer-cat.gif b3a53761cbdba474994f61ef697d6da6482488e688b25007fec82e6bfa409165"
+    "y9hjvnO2bwJbO city-cat.gif 077e4d0de9ae308a075070fec636474b17bec2d4f07c7a592a548206a56efceb"
+    "l4FGoTd3NjBCmnZyE psychedelic-cat-dreams.gif 8da45a9a5d621c799d3753ce91a97ecc6aae7c2e349109ff518ddd080859970e"
 )
 for g in "${GIFS[@]}"; do
     read -r id name sum <<<"$g"
     echo "Downloading $name from GIPHY..."
     curl -sfL --retry 2 --max-time 120 "https://media.giphy.com/media/$id/giphy.gif" -o "$work/$name" \
         || { echo "Couldn't download https://giphy.com/gifs/$id" >&2; exit 1; }
-    got=$(sha256sum < "$work/$name" | cut -c1-12)
+    got=$(sha256sum < "$work/$name" | cut -d' ' -f1)
     if [ "$got" != "$sum" ]; then
-        echo "Warning: $name isn't the same file the theme was made from (GIPHY may have changed it)." >&2
-        echo "         The cut-outs may not line up. Carrying on." >&2
+        echo "$name isn't the file the cut-outs were made for (GIPHY may have changed it):" >&2
+        echo "  expected $sum" >&2
+        echo "  got      $got" >&2
+        if [ "$force" = 1 ]; then
+            echo "  --force: carrying on; the cats may not line up." >&2
+        else
+            echo "Stopping. Run again with --force to use it anyway." >&2
+            exit 1
+        fi
     fi
 done
 

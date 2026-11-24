@@ -35,7 +35,6 @@ Window {
             anchors.fill: parent
             frozen: true
             seed: 1234
-            jadeNebula: true
         }
     }
 

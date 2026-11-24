@@ -24,7 +24,7 @@ DIRS      := assets get-cats tools LICENSES
 QM        := $(patsubst %.ts,%.qm,$(wildcard translations/*.ts))
 LANGS     := $(basename $(notdir $(wildcard translations/*.ts)))
 
-.PHONY: all install uninstall translations check lint test smoke visual i18n dist clean
+.PHONY: all install uninstall translations check versions lint test smoke visual i18n dist clean
 
 all: translations
 
@@ -44,7 +44,15 @@ install: translations
 uninstall:
 	rm -rf $(THEMEDIR)
 
-check: lint test smoke visual translations i18n
+check: versions lint test smoke visual translations i18n
+
+# the version is set in metadata.desktop; the PKGBUILD and changelog must agree,
+# and nothing else may spell one out
+versions:
+	@grep -q '^pkgver=$(VERSION)$$' packaging/arch/PKGBUILD || { echo "packaging/arch/PKGBUILD: pkgver is not $(VERSION)"; exit 1; }
+	@grep -q '^## \[$(VERSION)\]' CHANGELOG.md || { echo "CHANGELOG.md has no entry for $(VERSION)"; exit 1; }
+	@! grep -nE 'laser-cats-sddm-[0-9]+\.[0-9]+' README.md CONTRIBUTING.md docs/*.md || { echo "a version number is written out above"; exit 1; }
+	@echo "version $(VERSION) agrees everywhere"
 
 # VirtualKeyboard.qml needs qt6-virtualkeyboard; it's skipped if that isn't installed
 HAVE_VK   := $(wildcard /usr/lib/qt6/qml/QtQuick/VirtualKeyboard)

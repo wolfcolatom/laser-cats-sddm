@@ -15,10 +15,9 @@ Item {
 
     required property bool running      // shown and moving
     required property real clock        // seconds since the sky started
-    property bool jadeNebula: true      // the jade nebula, or the olive haze
 
     Repeater {
-        model: starfield.running ? [ { file: starfield.jadeNebula ? "haze-jade" : "haze-far", speed: 7 },
+        model: starfield.running ? [ { file: "haze-jade", speed: 7 },
                                      { file: "haze-near", speed: 11 },
                                      { file: "stars-still", speed: 0 }, { file: "stars-far", speed: 16 },
                                      { file: "stars-mid", speed: 37 }, { file: "stars-near", speed: 68 } ] : []

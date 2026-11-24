@@ -44,8 +44,6 @@ Item {
     property bool classic: false
     // the cat set in use: pictures, sizes, paw and eye spots (Cats.js)
     readonly property var cats: classic ? Cats.classic : Cats.own
-    // the jade nebula (in jade) instead of the olive haze
-    property bool jadeNebula: false
 
     // reactions (called by the login screen):
     //   keyPressed()    the cats and lasers flash a little brighter; every
@@ -69,6 +67,7 @@ Item {
     }
     function wrongPassword() { alarmAnim.restart() }
     function warpOut() { rewindAnim.stop(); warpAnim.restart() }
+    signal warpFinished()           // the explosion and warp have played right through
     function rewind() { warpAnim.stop(); rewindAnim.restart(); alarmAnim.restart() }
     function showComet() { comet.show() }     // (for testing)
     NumberAnimation { id: flashAnim; target: root; property: "flash"; from: 1; to: 0; duration: 380; easing.type: Easing.OutQuad }
@@ -80,6 +79,7 @@ Item {
     }
     SequentialAnimation {
         id: warpAnim
+        onFinished: root.warpFinished()
         NumberAnimation { target: root; property: "blast"; from: 0; to: 1; duration: 1300; easing.type: Easing.Linear }
         NumberAnimation { target: root; property: "warp"; from: 0; to: 1; duration: 900; easing.type: Easing.InQuad }
     }
@@ -91,7 +91,7 @@ Item {
     clip: true
 
     // the parts, back to front (each in its own file)
-    Starfield { running: root.running; clock: root.clock; jadeNebula: root.jadeNebula }
+    Starfield { running: root.running; clock: root.clock }
     DriftingPlanets { running: root.running; clock: root.clock; catScale: root.catScale }
     // two planet cats: the big one upper left, a smaller mirrored one upper
     // right; in front of the floating cats, comet and shooting stars
