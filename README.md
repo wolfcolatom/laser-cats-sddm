@@ -1,5 +1,7 @@
 # Laser Cats: an SDDM login theme
 
+[![check](https://github.com/wolfcolatom/laser-cats-sddm/actions/workflows/check.yml/badge.svg)](https://github.com/wolfcolatom/laser-cats-sddm/actions/workflows/check.yml)
+
 An animated space login screen. Laser-eyed kittens float through a drifting
 starfield and nebula; two tabbies rise out of burning planets, firing lasers
 from their paws that chip pieces off them. Typing makes the cats flash (and

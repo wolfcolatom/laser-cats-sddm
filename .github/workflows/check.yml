@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 tom
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Checks on every push and pull request:
+#   qml     Qt 6 qmllint with no warnings allowed, then the theme loaded
+#           headless with a stand-in for SDDM (ci/smoke.qml), logging in
+#           both normally and in calm mode; any QML warning fails it
+#   scripts shellcheck on get-cats.sh, and the Python tools compile
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  qml:
+    runs-on: ubuntu-latest
+    # Arch, for a current Qt 6 (the theme uses Qt 6.5+ QML features)
+    container: archlinux:latest
+    steps:
+      - name: Install Qt 6
+        run: pacman -Syu --noconfirm --needed qt6-declarative qt6-svg mesa ttf-dejavu git
+      - uses: actions/checkout@v4
+      - name: qmllint
+        run: /usr/lib/qt6/bin/qmllint --max-warnings 0 *.qml ci/*.qml
+      - name: Smoke test (normal and calm)
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_FORCE_STDERR_LOGGING: "1"
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          for mode in normal calm; do
+            echo "== $mode"
+            timeout 60 /usr/lib/qt6/bin/qml ci/smoke.qml -- "$mode" 2>&1 | tee "smoke-$mode.log"
+            status=${PIPESTATUS[0]}
+            if [ "$status" != 0 ]; then echo "::error::smoke test ($mode) exited $status"; exit 1; fi
+            if grep -E '\.qml:[0-9]+' "smoke-$mode.log"; then echo "::error::QML warnings in the $mode run"; exit 1; fi
+          done
+
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck get-cats.sh
+      - name: Python tools compile
+        run: python3 -m py_compile tools/*.py get-cats/*.py
