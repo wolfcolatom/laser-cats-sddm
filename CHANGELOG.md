@@ -4,6 +4,12 @@ All notable changes to Laser Cats. Versions follow
 [semantic versioning](https://semver.org); the format follows
 [Keep a Changelog](https://keepachangelog.com).
 
+## [1.7.2] - 2026-11-24
+
+### Fixed
+- The two planet cats roared in unison: both started the same animation
+  at the same moment. The right one now starts half a roar later.
+
 ## [1.7.1] - 2026-11-24
 
 ### Fixed
@@ -170,6 +176,7 @@ Nothing looks different; this release is about how the theme is built.
 
 First release.
 
+[1.7.2]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7.2
 [1.7.1]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7.1
 [1.7]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.7
 [1.6]: https://github.com/wolfcolatom/laser-cats-sddm/releases/tag/v1.6
