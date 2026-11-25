@@ -106,7 +106,11 @@ fire their lasers. Plasma Login Manager draws its own clock, user picture
 and password field on top (and blurs the wallpaper while you type), so the
 theme's own login screen doesn't carry over: for that, use SDDM.
 
-Install it for everyone (Plasma Login Manager only sees wallpapers
+For the desktop or lock screen, the easy way: in the wallpaper settings,
+**Get New Plugins…** → search "Laser Cats"
+([KDE Store page](https://store.kde.org/p/2382655)).
+
+For Plasma Login Manager, install it for everyone (it only sees wallpapers
 installed this way):
 
 ```
